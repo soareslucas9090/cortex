@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
@@ -14,8 +14,8 @@ from .serializers import *
 
 
 class TipoViewSet(ModelViewSet):
-    queryset = models.Tipo.objects.all()
-    serializer_class = serializers.TipoSerializer
+    queryset = Tipo.objects.all()
+    serializer_class = TipoSerializer
     permission_classes = [
         IsAuthenticated,
     ]
@@ -35,8 +35,8 @@ class TipoViewSet(ModelViewSet):
 
 
 class EnderecoViewSet(ModelViewSet):
-    queryset = models.Endereco.objects.all()
-    serializer_class = serializers.EnderecoSerializer
+    queryset = Endereco.objects.all()
+    serializer_class = EnderecoSerializer
     permission_classes = [
         IsAuthenticated,
     ]
@@ -44,8 +44,8 @@ class EnderecoViewSet(ModelViewSet):
 
 
 class ContatoViewSet(ModelViewSet):
-    queryset = models.Contato.objects.all()
-    serializer_class = serializers.ContatoSerializer
+    queryset = Contato.objects.all()
+    serializer_class = ContatoSerializer
     permission_classes = [
         IsAuthenticated,
     ]
@@ -70,8 +70,8 @@ class ContatoViewSet(ModelViewSet):
 
 
 class EmpresaViewSet(ModelViewSet):
-    queryset = models.Empresa.objects.all()
-    serializer_class = serializers.EmpresaSerializer
+    queryset = Empresa.objects.all()
+    serializer_class = EmpresaSerializer
     permission_classes = [
         IsAuthenticated,
     ]
@@ -95,11 +95,11 @@ class EmpresaViewSet(ModelViewSet):
         return queryset
 
 
-class UsuarioViewSet(ModelViewSet):
-    queryset = models.User.objects.all()
-    serializer_class = serializers.UserSerializer
+class UserViewSet(ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
     permission_classes = [
-        IsAuthenticated,
+        AllowAny,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -172,8 +172,8 @@ class UsuarioViewSet(ModelViewSet):
 
 
 class SetorViewSet(ModelViewSet):
-    queryset = models.Setor.objects.all()
-    serializer_class = serializers.SetorSerializer
+    queryset = Setor.objects.all()
+    serializer_class = SetorSerializer
     permission_classes = [
         IsAuthenticated,
     ]
@@ -191,9 +191,9 @@ class SetorViewSet(ModelViewSet):
         return queryset
 
 
-class SetorUsuarioViewSet(ModelViewSet):
-    queryset = models.SETOR_USUARIO.objects.all()
-    serializer_class = serializers.SetorUsuarioSerializer
+class SetorUserViewSet(ModelViewSet):
+    queryset = Setor_User.objects.all()
+    serializer_class = Setor_UserSerializer
     permission_classes = [
         IsAuthenticated,
     ]
@@ -202,8 +202,8 @@ class SetorUsuarioViewSet(ModelViewSet):
 
 """
 class AlteracaoUsuarioViewSet(ModelViewSet):
-    queryset = models.ALTERACAO_USUARIO.objects.all()
-    serializer_class = serializers.AlteracaoUsuarioSerializer
+    queryset = ALTERACAO_USUARIO.objects.all()
+    serializer_class = AlteracaoUsuarioSerializer
     permission_classes = [
         IsAuthenticated,
     ]
@@ -212,8 +212,8 @@ class AlteracaoUsuarioViewSet(ModelViewSet):
 
 
 class TipoMatriculaViewSet(ModelViewSet):
-    queryset = models.Tipo_Matricula.objects.all()
-    serializer_class = serializers.TipoMatriculaSerializer
+    queryset = Tipo_Matricula.objects.all()
+    serializer_class = Tipo_MatriculaSerializer
     permission_classes = [
         IsAuthenticated,
     ]
@@ -232,8 +232,8 @@ class TipoMatriculaViewSet(ModelViewSet):
 
 
 class MatriculaViewSet(ModelViewSet):
-    queryset = models.Matricula.objects.all()
-    serializer_class = serializers.MatriculaSerializer
+    queryset = Matricula.objects.all()
+    serializer_class = MatriculaSerializer
     permission_classes = [
         IsAuthenticated,
     ]

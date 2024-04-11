@@ -62,12 +62,14 @@ class Setor_UserSerializer(serializers.ModelSerializer):
         user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
 
+"""
 class Alteracao_UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Alteracao_User
         fields = "__all__"
 
         user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+"""
 
 
 class Tipo_MatriculaSerializer(serializers.ModelSerializer):

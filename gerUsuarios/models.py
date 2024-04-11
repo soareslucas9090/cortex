@@ -17,9 +17,9 @@ class UserManager(BaseUserManager):
         password=None,
     ):
         if not nome:
-            raise ValueError("O usuário precisa de um nome válido")
+            raise ValueError("O usuário precisa de um nome válido!")
         if not cpf:
-            raise ValueError("O usuário precisa fornecer um CPF válido")
+            raise ValueError("O usuário precisa fornecer um CPF válido!")
 
         user = self.model(
             nome=nome,
@@ -50,22 +50,23 @@ class User(AbstractBaseUser):
     nome = models.CharField(max_length=255, null=False)
     email = models.EmailField(unique=True, null=False)
     tipo = models.ForeignKey(
-        "Tipo", related_name="user_tipo", on_delete=models.RESTRICT, null=False
+        "Tipo", related_name="user_tipo", on_delete=models.RESTRICT, null=True
     )
     contato = models.ForeignKey(
-        "Contato", related_name="user_contato", on_delete=models.RESTRICT, null=False
+        "Contato", related_name="user_contato", on_delete=models.RESTRICT, null=True
     )
     empresa = models.ForeignKey(
-        "Empresa", related_name="user_empresa", on_delete=models.RESTRICT, null=False
+        "Empresa", related_name="user_empresa", on_delete=models.RESTRICT, null=True
     )
     cpf = models.CharField(max_length=11, null=False, unique=True)
-    data_nascimento = models.DateField(null=False)
+    data_nascimento = models.DateField(null=True)
     setores = models.ManyToManyField("Setor", through="Setor_User")
+    is_ativo = models.BooleanField(default=True, null=True)
 
     date_joined = models.DateTimeField(auto_now_add=True)
 
     REQUIRED_FIELDS = [
-        "name",
+        "nome",
     ]
 
     USERNAME_FIELD = "cpf"
