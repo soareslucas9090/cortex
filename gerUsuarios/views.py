@@ -96,8 +96,8 @@ class EmpresaViewSet(ModelViewSet):
 
 
 class UsuarioViewSet(ModelViewSet):
-    queryset = models.Usuario.objects.all()
-    serializer_class = serializers.UsuarioSerializer
+    queryset = models.User.objects.all()
+    serializer_class = serializers.UserSerializer
     permission_classes = [
         IsAuthenticated,
     ]
@@ -129,51 +129,66 @@ class UsuarioViewSet(ModelViewSet):
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
         )
 
-    @action(detail=True, methods=["get"])
-    def matricula(self, request, pk=None):
-        # A paginação não afeta métodos feitos por nós na ViewSet, por isso precisamos criar uma paginação específica
-        self.pagination_class.page_size = 3
-        matricula = models.MATRICULA.objects.filter(ID_USUARIO=pk)
-        page = self.paginate_queryset(matricula)
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
 
-        if page is not None:
-            serializer = serializers.MatriculaSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+        if "date_joined" in request.data:
+            request.data.pop("date_joined")
+        if "is_superuser" in request.data:
+            request.data.pop("is_superuser")
+        if "is_staff" in request.data:
+            request.data.pop("is_staff")
+        if "is_admin" in request.data:
+            request.data.pop("is_admin")
+        if "is_active" in request.data:
+            request.data.pop("is_active")
 
-        serializer = serializers.MatriculaSerializer(
-            matricula.MATRICULA_ID_USUARIO.all(), many=True
-        )
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, "_prefetched_objects_cache", None):
+            instance._prefetched_objects_cache = {}
+
         return Response(serializer.data)
 
-
-"""
-Método de validação de login usado antes da decisão de usar functions
-class UsuarioSenhaViewSet(ModelViewSet):
-    queryset = models.USUARIO.objects.all()
-    serializer_class = serializers.UsuarioSenhaSerializer
-
     def get_queryset(self):
-        queryset = self.queryset
-        nome = self.request.query_params.get('nome', None)
-        senha = self.request.query_params.get('senha', None)
-        
-        if nome is not None:
-            queryset = queryset.filter(NOME=nome)
-        
-        if senha is not None:
-            queryset = queryset.filter(SENHA=senha)
-            
+        queryset = super().get_queryset()
+
+        nome = self.request.query_params.get("nome", None)
+
+        if nome:
+            queryset = queryset.filter(nome=nome)
+            return queryset
+
+        cpf = self.request.query_params.get("cpf", None)
+
+        if cpf and cpf.isnumeric():
+            queryset = queryset.filter(cpf=cpf)
+            return queryset
+
         return queryset
-"""
 
 
 class SetorViewSet(ModelViewSet):
-    queryset = models.SETOR.objects.all()
+    queryset = models.Setor.objects.all()
     serializer_class = serializers.SetorSerializer
     permission_classes = [
         IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        nome = self.request.query_params.get("nome", None)
+
+        if nome:
+            queryset = queryset.filter(nome=nome)
+            return queryset
+
+        return queryset
 
 
 class SetorUsuarioViewSet(ModelViewSet):
@@ -185,6 +200,7 @@ class SetorUsuarioViewSet(ModelViewSet):
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
 
+"""
 class AlteracaoUsuarioViewSet(ModelViewSet):
     queryset = models.ALTERACAO_USUARIO.objects.all()
     serializer_class = serializers.AlteracaoUsuarioSerializer
@@ -192,30 +208,56 @@ class AlteracaoUsuarioViewSet(ModelViewSet):
         IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
+"""
 
 
 class TipoMatriculaViewSet(ModelViewSet):
-    queryset = models.TIPO_MATRICULA.objects.all()
+    queryset = models.Tipo_Matricula.objects.all()
     serializer_class = serializers.TipoMatriculaSerializer
     permission_classes = [
         IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        descricao = self.request.query_params.get("descricao", None)
+
+        if descricao:
+            queryset = queryset.filter(descricao=descricao)
+            return queryset
+
+        return queryset
+
 
 class MatriculaViewSet(ModelViewSet):
-    queryset = models.MATRICULA.objects.all()
+    queryset = models.Matricula.objects.all()
     serializer_class = serializers.MatriculaSerializer
     permission_classes = [
         IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
 
-class PermissoesViewSet(ModelViewSet):
-    queryset = models.PERMISSOES.objects.all()
-    serializer_class = serializers.PermissoesSerializer
-    permission_classes = [
-        IsAuthenticated,
-    ]
-    http_method_names = ["get", "head", "patch", "delete", "post"]
+        user = self.request.query_params.get("user", None)
+
+        if user and user.isnumeric():
+            queryset = queryset.filter(user=user)
+            return queryset
+
+        tipo_matricula = self.request.query_params.get("tipo", None)
+
+        if tipo_matricula and tipo_matricula.isnumeric():
+            queryset = queryset.filter(tipo_matricula=tipo_matricula)
+            return queryset
+
+        matricula = self.request.query_params.get("matricula", None)
+
+        if matricula:
+            queryset = queryset.filter(matricula=matricula)
+            return queryset
+
+        return queryset

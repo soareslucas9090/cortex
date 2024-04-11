@@ -138,6 +138,7 @@ class Setor_User(Base):
         return str
 
 
+"""
 class Alteracao_User(models.Model):
     user = models.ForeignKey(
         User, related_name="alteracao_user_user", on_delete=models.RESTRICT, null=False
@@ -147,6 +148,7 @@ class Alteracao_User(models.Model):
     antigo_contato = models.IntegerField(null=True)
     novo_contato = models.IntegerField(null=True)
     user_analista = models.IntegerField(null=True)
+"""
 
 
 class Tipo_Matricula(Base):
