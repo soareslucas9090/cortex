@@ -103,56 +103,6 @@ class UserViewSet(ModelViewSet):
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
-    def create(self, request, *args, **kwargs):
-        if "date_joined" in request.data:
-            request.data.pop("date_joined")
-        if "is_superuser" in request.data:
-            request.data.pop("is_superuser")
-        if "is_staff" in request.data:
-            request.data.pop("is_staff")
-        if "is_admin" in request.data:
-            request.data.pop("is_admin")
-        if "is_ativo" in request.data:
-            request.data.pop("is_active")
-        if "last_login" in request.data:
-            request.data.pop("last_login")
-
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        password256 = make_password(password=request.data["password"])
-
-        serializer.save(password=password256)
-
-        headers = self.get_success_headers(serializer.data)
-        return Response(
-            serializer.data, status=status.HTTP_201_CREATED, headers=headers
-        )
-
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop("partial", False)
-        instance = self.get_object()
-
-        if "date_joined" in request.data:
-            request.data.pop("date_joined")
-        if "is_superuser" in request.data:
-            request.data.pop("is_superuser")
-        if "is_staff" in request.data:
-            request.data.pop("is_staff")
-        if "is_admin" in request.data:
-            request.data.pop("is_admin")
-        if "is_active" in request.data:
-            request.data.pop("is_active")
-
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-
-        if getattr(instance, "_prefetched_objects_cache", None):
-            instance._prefetched_objects_cache = {}
-
-        return Response(serializer.data)
-
     def get_queryset(self):
         queryset = super().get_queryset()
 
@@ -175,7 +125,7 @@ class SetorViewSet(ModelViewSet):
     queryset = Setor.objects.all()
     serializer_class = SetorSerializer
     permission_classes = [
-        IsAuthenticated,
+        AllowAny,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -215,7 +165,7 @@ class TipoMatriculaViewSet(ModelViewSet):
     queryset = Tipo_Matricula.objects.all()
     serializer_class = Tipo_MatriculaSerializer
     permission_classes = [
-        IsAuthenticated,
+        AllowAny,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -235,7 +185,7 @@ class MatriculaViewSet(ModelViewSet):
     queryset = Matricula.objects.all()
     serializer_class = MatriculaSerializer
     permission_classes = [
-        IsAuthenticated,
+        AllowAny,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 

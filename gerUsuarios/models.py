@@ -9,79 +9,6 @@ class Base(models.Model):
         abstract = True
 
 
-class UserManager(BaseUserManager):
-    def create_user(
-        self,
-        nome,
-        cpf,
-        password=None,
-    ):
-        if not nome:
-            raise ValueError("O usuário precisa de um nome válido!")
-        if not cpf:
-            raise ValueError("O usuário precisa fornecer um CPF válido!")
-
-        user = self.model(
-            nome=nome,
-            cpf=cpf,
-        )
-
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(
-        self,
-        nome,
-        cpf,
-        password,
-    ):
-        user = self.create_user(
-            nome=nome,
-            cpf=cpf,
-            password=password,
-        )
-
-        user.save(using=self._db)
-        return user
-
-
-class User(AbstractBaseUser):
-    nome = models.CharField(max_length=255, null=False)
-    email = models.EmailField(unique=True, null=False)
-    tipo = models.ForeignKey(
-        "Tipo", related_name="user_tipo", on_delete=models.RESTRICT, null=True
-    )
-    contato = models.ForeignKey(
-        "Contato", related_name="user_contato", on_delete=models.RESTRICT, null=True
-    )
-    empresa = models.ForeignKey(
-        "Empresa", related_name="user_empresa", on_delete=models.RESTRICT, null=True
-    )
-    cpf = models.CharField(max_length=11, null=False, unique=True)
-    data_nascimento = models.DateField(null=True)
-    setores = models.ManyToManyField("Setor", through="Setor_User")
-    is_ativo = models.BooleanField(default=True, null=True)
-
-    date_joined = models.DateTimeField(auto_now_add=True)
-
-    REQUIRED_FIELDS = [
-        "nome",
-    ]
-
-    USERNAME_FIELD = "cpf"
-
-    objects = UserManager()
-
-    def __str__(self):
-        str = f"{self.nome}"
-        return str
-
-    class Meta:
-        verbose_name = "user"
-        verbose_name_plural = "users"
-
-
 class Tipo(Base):
     nome = models.CharField(max_length=50, unique=True, null=False)
 
@@ -101,6 +28,10 @@ class Endereco(Base):
     complemento = models.CharField(max_length=30, null=True)
     num_casa = models.IntegerField(null=False)
 
+    def __str__(self):
+        str = f"{self.logradouro}"
+        return str
+
 
 class Contato(Base):
     endereco = models.ForeignKey(
@@ -108,6 +39,10 @@ class Contato(Base):
     )
     email = models.EmailField(max_length=60, null=False)
     tel = models.CharField(max_length=11, null=False)
+
+    def __str__(self):
+        str = f"{self.tel}"
+        return str
 
 
 class Empresa(Base):
@@ -117,6 +52,127 @@ class Empresa(Base):
     nome = models.CharField(max_length=30, null=False)
     cnpj = models.CharField(max_length=14, unique=True, null=False)
 
+    def __str__(self):
+        str = f"{self.nome}"
+        return str
+
+
+class UserManager(BaseUserManager):
+    def create_user(
+        self,
+        cpf,
+        nome,
+        email,
+        tipo,
+        contato,
+        empresa,
+        data_nascimento,
+        is_ativo,
+        password=None,
+    ):
+        if not nome:
+            raise ValueError("O usuário precisa de um nome válido!")
+        if not cpf:
+            raise ValueError("O usuário precisa fornecer um CPF válido!")
+        if not email:
+            raise ValueError("O usuário precisa fornecer um email válido!")
+        if not tipo:
+            raise ValueError("O usuário precisa fornecer um tipo válido!")
+        if not contato:
+            raise ValueError("O usuário precisa fornecer um contato válido!")
+        if not empresa:
+            raise ValueError("O usuário precisa fornecer uma empresa válida!")
+        if not data_nascimento:
+            raise ValueError(
+                "O usuário precisa fornecer uma data de nascimento válida!"
+            )
+        if not is_ativo:
+            raise ValueError("O usuário precisa fornecer um estado de ativo válido!")
+
+        user = self.model(
+            cpf=cpf,
+            nome=nome,
+            email=email,
+            tipo=Tipo.objects.get(pk=tipo),
+            contato=Contato.objects.get(pk=contato),
+            empresa=Empresa.objects.get(pk=empresa),
+            data_nascimento=data_nascimento,
+            is_ativo=is_ativo,
+        )
+
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(
+        self,
+        cpf,
+        nome,
+        email,
+        tipo,
+        contato,
+        empresa,
+        data_nascimento,
+        is_ativo,
+        password,
+    ):
+        user = self.create_user(
+            cpf=cpf,
+            nome=nome,
+            email=email,
+            tipo=Tipo.objects.get(pk=tipo).id,
+            contato=Contato.objects.get(pk=contato).id,
+            empresa=Empresa.objects.get(pk=empresa).id,
+            data_nascimento=data_nascimento,
+            is_ativo=is_ativo,
+            password=password,
+        )
+
+        user.save(using=self._db)
+        return user
+
+
+class User(AbstractBaseUser):
+    nome = models.CharField(max_length=255, null=False)
+    email = models.EmailField(unique=True, null=False)
+    tipo = models.ForeignKey(
+        Tipo, related_name="user_tipo", on_delete=models.RESTRICT, null=False
+    )
+    contato = models.ForeignKey(
+        Contato, related_name="user_contato", on_delete=models.RESTRICT, null=False
+    )
+    empresa = models.ForeignKey(
+        Empresa, related_name="user_empresa", on_delete=models.RESTRICT, null=False
+    )
+    cpf = models.CharField(max_length=11, null=False, unique=True)
+    data_nascimento = models.DateField(null=True)
+    setores = models.ManyToManyField("Setor", through="Setor_User")
+    is_ativo = models.BooleanField(default=True, null=True)
+
+    date_joined = models.DateTimeField(auto_now_add=True)
+
+    REQUIRED_FIELDS = [
+        "nome",
+        "email",
+        "tipo",
+        "contato",
+        "empresa",
+        "data_nascimento",
+        "is_ativo",
+    ]
+
+    USERNAME_FIELD = "cpf"
+
+    objects = UserManager()
+
+    def __str__(self):
+        str = f"{self.nome}"
+        return str
+
+    class Meta:
+        verbose_name = "user"
+        verbose_name_plural = "users"
+
 
 class Setor(Base):
     nome = models.CharField(max_length=50, null=False)
@@ -124,6 +180,10 @@ class Setor(Base):
     def save(self, *args, **kwargs):
         self.nome = self.nome.lower()
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        str = f"{self.nome}"
+        return str
 
 
 class Setor_User(Base):
@@ -159,6 +219,10 @@ class Tipo_Matricula(Base):
         self.descricao = self.descricao.lower()
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        str = f"{self.descricao}"
+        return str
+
 
 class Matricula(Base):
     user = models.ForeignKey(
@@ -173,3 +237,7 @@ class Matricula(Base):
     matricula = models.CharField(max_length=19, null=False, unique=True)
     validade = models.DateField(null=True)
     expedicao = models.DateField(null=False)
+
+    def __str__(self):
+        str = f"{self.matricula}"
+        return str

@@ -8,7 +8,16 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = "__all__"
 
-        tipo = serializers.PrimaryKeyRelatedField(queryset=Tipo.objects.all())
+    password = serializers.CharField(write_only=True)
+    date_joined = serializers.DateTimeField(read_only=True)
+    last_login = serializers.DateTimeField(read_only=True)
+    setores = serializers.PrimaryKeyRelatedField(
+        queryset=Setor.objects.all(), many=True, allow_empty=False
+    )
+    tipo = serializers.PrimaryKeyRelatedField(queryset=Tipo.objects.all())
+    contato = serializers.PrimaryKeyRelatedField(queryset=Contato.objects.all())
+    empresa = serializers.PrimaryKeyRelatedField(queryset=Empresa.objects.all())
+    matricula = serializers.SerializerMethodField()
 
     def validate_password(self, value):
         password = value
@@ -17,6 +26,14 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Must have at least 8 chars.")
 
         return password
+
+    def get_matricula(self, obj):
+        try:
+            matriculas = Matricula.objects.filter(user=obj)
+            serializer = Matricula2UserSerializer(matriculas, many=True)
+            return serializer.data
+        except:
+            return None
 
 
 class TipoSerializer(serializers.ModelSerializer):
@@ -36,7 +53,7 @@ class ContatoSerializer(serializers.ModelSerializer):
         model = Contato
         fields = "__all__"
 
-        endereco = serializers.PrimaryKeyRelatedField(queryset=Endereco.objects.all())
+    endereco = serializers.PrimaryKeyRelatedField(queryset=Endereco.objects.all())
 
 
 class EmpresaSerializer(serializers.ModelSerializer):
@@ -44,7 +61,7 @@ class EmpresaSerializer(serializers.ModelSerializer):
         model = Empresa
         fields = "__all__"
 
-        contato = serializers.PrimaryKeyRelatedField(queryset=Contato.objects.all())
+    contato = serializers.PrimaryKeyRelatedField(queryset=Contato.objects.all())
 
 
 class SetorSerializer(serializers.ModelSerializer):
@@ -58,8 +75,8 @@ class Setor_UserSerializer(serializers.ModelSerializer):
         model = Setor_User
         fields = "__all__"
 
-        setor = serializers.PrimaryKeyRelatedField(queryset=Setor.objects.all())
-        user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    setor = serializers.PrimaryKeyRelatedField(queryset=Setor.objects.all())
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
 
 """
@@ -83,7 +100,22 @@ class MatriculaSerializer(serializers.ModelSerializer):
         model = Matricula
         fields = "__all__"
 
-        user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-        tipo_matricula = serializers.PrimaryKeyRelatedField(
-            queryset=Tipo_Matricula.objects.all()
-        )
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    tipo_matricula = serializers.PrimaryKeyRelatedField(
+        queryset=Tipo_Matricula.objects.all()
+    )
+
+
+class Matricula2UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Matricula
+        fields = [
+            "id",
+            "matricula",
+            "tipo_matricula",
+            "is_ativo",
+        ]
+
+    tipo_matricula = serializers.PrimaryKeyRelatedField(
+        queryset=Tipo_Matricula.objects.all()
+    )
