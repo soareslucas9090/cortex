@@ -1,11 +1,14 @@
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from .models import *
+from .permissions import *
 from .serializers import *
 
 
@@ -29,21 +32,33 @@ class TipoViewSet(ModelViewSet):
 
         return queryset
 
+    def get_permissions(self):
+        if self.request.method in ["POST", "PATCH", "DELETE"]:
+            return [IsAdminOrTI()]
+
+        return super().get_permissions()
+
 
 class EnderecoViewSet(ModelViewSet):
     queryset = Endereco.objects.all()
     serializer_class = EnderecoSerializer
     permission_classes = [
-        IsAuthenticated,
+        AllowAny,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
+
+    def get_permissions(self):
+        if self.request.method in ["POST", "DELETE"]:
+            return [IsAdminOrTI()]
+
+        return super().get_permissions()
 
 
 class ContatoViewSet(ModelViewSet):
     queryset = Contato.objects.all()
     serializer_class = ContatoSerializer
     permission_classes = [
-        IsAuthenticated,
+        AllowAny,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -64,12 +79,18 @@ class ContatoViewSet(ModelViewSet):
 
         return queryset
 
+    def get_permissions(self):
+        if self.request.method in ["POST", "DELETE"]:
+            return [IsAdminOrTI()]
+
+        return super().get_permissions()
+
 
 class EmpresaViewSet(ModelViewSet):
     queryset = Empresa.objects.all()
     serializer_class = EmpresaSerializer
     permission_classes = [
-        IsAuthenticated,
+        AllowAny,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -89,6 +110,12 @@ class EmpresaViewSet(ModelViewSet):
             return queryset
 
         return queryset
+
+    def get_permissions(self):
+        if self.request.method in ["POST", "PATCH", "DELETE"]:
+            return [IsAdminOrTI()]
+
+        return super().get_permissions()
 
 
 class UserViewSet(ModelViewSet):
@@ -116,6 +143,38 @@ class UserViewSet(ModelViewSet):
 
         return queryset
 
+    def create(self, request, *args, **kwargs):
+        if "date_joined" in request.data:
+            request.data.pop("date_joined")
+        if "is_superuser" in request.data:
+            request.data.pop("is_superuser")
+        if "is_staff" in request.data:
+            request.data.pop("is_staff")
+        if "is_admin" in request.data:
+            request.data.pop("is_admin")
+        if "is_active" in request.data:
+            request.data.pop("is_active")
+        if "last_login" in request.data:
+            request.data.pop("last_login")
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        password256 = make_password(password=request.data["password"])
+
+        serializer.save(password=password256)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
+
+    def get_permissions(self):
+        if self.request.method in ["POST", "DELETE"]:
+            return [IsAdminOrTI()]
+
+        return super().get_permissions()
+
 
 class SetorViewSet(ModelViewSet):
     queryset = Setor.objects.all()
@@ -136,6 +195,12 @@ class SetorViewSet(ModelViewSet):
 
         return queryset
 
+    def get_permissions(self):
+        if self.request.method in ["POST", "PATCH", "DELETE"]:
+            return [IsAdminOrTI()]
+
+        return super().get_permissions()
+
 
 class SetorUserViewSet(ModelViewSet):
     queryset = Setor_User.objects.all()
@@ -144,6 +209,12 @@ class SetorUserViewSet(ModelViewSet):
         IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
+
+    def get_permissions(self):
+        if self.request.method in ["POST", "PATCH", "DELETE"]:
+            return [IsAdminOrTI()]
+
+        return super().get_permissions()
 
 
 """
@@ -175,6 +246,12 @@ class TipoMatriculaViewSet(ModelViewSet):
             return queryset
 
         return queryset
+
+    def get_permissions(self):
+        if self.request.method in ["POST", "PATCH", "DELETE"]:
+            return [IsAdminOrTI()]
+
+        return super().get_permissions()
 
 
 class MatriculaViewSet(ModelViewSet):

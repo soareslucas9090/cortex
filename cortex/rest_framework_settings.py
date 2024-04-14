@@ -14,11 +14,18 @@ REST_FRAMEWORK = {
     # Paginação
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 10,
+    "DATE_INPUT_FORMATS": ["%d-%m-%y", "%d-%m-%Y", "%d/%m/%y", "%d/%m/%Y"],
+    "TIME_INPUT_FORMATS": [
+        "%d-%m-%yT%H:%M:%S",
+        "%d-%m-%YT%H:%M:%S",
+        "%d/%m/%yT%H:%M:%S",
+        "%d/%m/%YT%H:%M:%S",
+    ],
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
-    "REFRESH_TOKEN_LIFETIME": timedelta(minutes=75),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "BLACKLIST_AFTER_ROTATION": False,
     "SIGNING_KEY": secretKeyJWT,
     "AUTH_HEADER_TYPES": ("Bearer",),

@@ -14,6 +14,10 @@ class UserSoticon(modelsUsusarios.Base):
     )
     faltas = models.IntegerField(null=False)
 
+    def __str__(self):
+        str = f"{self.usuario.nome}"
+        return str
+
 
 class Strike(modelsUsusarios.Base):
     user_soticon = models.ForeignKey(
@@ -23,6 +27,10 @@ class Strike(modelsUsusarios.Base):
         null=False,
     )
     data = models.DateField(auto_now_add=True, null=False)
+
+    def __str__(self):
+        str = f"{self.user_soticon.nome}"
+        return str
 
 
 class Justificativa(modelsUsusarios.Base):
@@ -35,9 +43,17 @@ class Justificativa(modelsUsusarios.Base):
     data = models.DateField(auto_now_add=True, null=False)
     obs = models.CharField(max_length=512, null=False)
 
+    def __str__(self):
+        str = f"{self.strike}"
+        return str
+
 
 class PosicaoFila(modelsUsusarios.Base):
     num_ticket = models.IntegerField(null=False, unique=True)
+
+    def __str__(self):
+        str = f"{self.num_ticket}"
+        return str
 
 
 class Rota(modelsUsusarios.Base):
@@ -45,6 +61,10 @@ class Rota(modelsUsusarios.Base):
     data = models.DateField(null=False)
     status = models.CharField(max_length=30, null=False)
     horario = models.DateTimeField(null=False)
+
+    def __str__(self):
+        str = f"{self.horario}"
+        return str
 
 
 class Tickets(models.Model):
@@ -65,6 +85,10 @@ class Tickets(models.Model):
         on_delete=models.RESTRICT,
         null=False,
     )
+
+    def __str__(self):
+        str = f"Rota: {self.rota}, userSoticon: {self.user_soticon}"
+        return str
 
 
 class Regras(modelsUsusarios.Base):

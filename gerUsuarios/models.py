@@ -1,4 +1,10 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, User
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    Permission,
+    PermissionsMixin,
+    User,
+)
 from django.db import models
 
 
@@ -64,11 +70,9 @@ class UserManager(BaseUserManager):
         nome,
         email,
         tipo,
-        contato,
-        empresa,
         data_nascimento,
-        is_ativo,
         password=None,
+        **extra_fields,
     ):
         if not nome:
             raise ValueError("O usuário precisa de um nome válido!")
@@ -78,26 +82,18 @@ class UserManager(BaseUserManager):
             raise ValueError("O usuário precisa fornecer um email válido!")
         if not tipo:
             raise ValueError("O usuário precisa fornecer um tipo válido!")
-        if not contato:
-            raise ValueError("O usuário precisa fornecer um contato válido!")
-        if not empresa:
-            raise ValueError("O usuário precisa fornecer uma empresa válida!")
         if not data_nascimento:
             raise ValueError(
                 "O usuário precisa fornecer uma data de nascimento válida!"
             )
-        if not is_ativo:
-            raise ValueError("O usuário precisa fornecer um estado de ativo válido!")
 
         user = self.model(
             cpf=cpf,
             nome=nome,
-            email=email,
+            email=self.normalize_email(email),
             tipo=Tipo.objects.get(pk=tipo),
-            contato=Contato.objects.get(pk=contato),
-            empresa=Empresa.objects.get(pk=empresa),
             data_nascimento=data_nascimento,
-            is_ativo=is_ativo,
+            **extra_fields,
         )
 
         user.set_password(password)
@@ -110,55 +106,66 @@ class UserManager(BaseUserManager):
         nome,
         email,
         tipo,
-        contato,
-        empresa,
         data_nascimento,
-        is_ativo,
-        password,
+        password=None,
+        **extra_fields,
     ):
+
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_admin", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_admin") is not True:
+            raise ValueError("Superuser must have is_admin=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+
         user = self.create_user(
             cpf=cpf,
             nome=nome,
             email=email,
-            tipo=Tipo.objects.get(pk=tipo).id,
-            contato=Contato.objects.get(pk=contato).id,
-            empresa=Empresa.objects.get(pk=empresa).id,
+            tipo=tipo,
             data_nascimento=data_nascimento,
-            is_ativo=is_ativo,
             password=password,
+            **extra_fields,
         )
 
-        user.save(using=self._db)
+        permissions = Permission.objects.all()
+        user.user_permissions.set(permissions)
+
         return user
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     nome = models.CharField(max_length=255, null=False)
     email = models.EmailField(unique=True, null=False)
     tipo = models.ForeignKey(
         Tipo, related_name="user_tipo", on_delete=models.RESTRICT, null=False
     )
     contato = models.ForeignKey(
-        Contato, related_name="user_contato", on_delete=models.RESTRICT, null=False
+        Contato, related_name="user_contato", on_delete=models.RESTRICT, null=True
     )
     empresa = models.ForeignKey(
-        Empresa, related_name="user_empresa", on_delete=models.RESTRICT, null=False
+        Empresa, related_name="user_empresa", on_delete=models.RESTRICT, null=True
     )
     cpf = models.CharField(max_length=11, null=False, unique=True)
     data_nascimento = models.DateField(null=True)
     setores = models.ManyToManyField("Setor", through="Setor_User")
-    is_ativo = models.BooleanField(default=True, null=True)
 
     date_joined = models.DateTimeField(auto_now_add=True)
+
+    is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
 
     REQUIRED_FIELDS = [
         "nome",
         "email",
         "tipo",
-        "contato",
-        "empresa",
         "data_nascimento",
-        "is_ativo",
     ]
 
     USERNAME_FIELD = "cpf"
@@ -166,8 +173,7 @@ class User(AbstractBaseUser):
     objects = UserManager()
 
     def __str__(self):
-        str = f"{self.nome}"
-        return str
+        return self.nome
 
     class Meta:
         verbose_name = "user"

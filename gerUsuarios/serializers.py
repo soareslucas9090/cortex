@@ -15,8 +15,12 @@ class UserSerializer(serializers.ModelSerializer):
         queryset=Setor.objects.all(), many=True, allow_empty=False
     )
     tipo = serializers.PrimaryKeyRelatedField(queryset=Tipo.objects.all())
-    contato = serializers.PrimaryKeyRelatedField(queryset=Contato.objects.all())
-    empresa = serializers.PrimaryKeyRelatedField(queryset=Empresa.objects.all())
+    contato = serializers.PrimaryKeyRelatedField(
+        queryset=Contato.objects.all(), allow_empty=False
+    )
+    empresa = serializers.PrimaryKeyRelatedField(
+        queryset=Empresa.objects.all(), allow_empty=False
+    )
     matricula = serializers.SerializerMethodField()
 
     def validate_password(self, value):

@@ -3,44 +3,48 @@ from django.contrib import admin
 from .models import *
 
 
-@admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "nome",
-        "email",
-        "tipo",
-        "contato",
-        "empresa",
-        "cpf",
-        "data_nascimento",
-        "is_ativo",
-    )
+    pass
 
 
-@admin.register(Endereco)
 class EnderecoAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "logradouro",
-        "bairro",
-        "cep",
-        "complemento",
-        "num_casa",
-        "is_ativo",
-    )
+    pass
 
 
-@admin.register(Tipo)
 class TipoAdmin(admin.ModelAdmin):
-    list_display = ("id", "nome", "is_ativo")
+    pass
 
 
-@admin.register(Contato)
 class ContatoAdmin(admin.ModelAdmin):
-    list_display = ("id", "endereco", "email", "tel", "is_ativo")
+    pass
 
 
-@admin.register(Empresa)
 class EmpresaAdmin(admin.ModelAdmin):
-    list_display = ("id", "contato", "nome", "cnpj", "is_ativo")
+    pass
+
+
+class SetorAdmin(admin.ModelAdmin):
+    pass
+
+
+class SetorUserAdmin(admin.ModelAdmin):
+    pass
+
+
+class TipoMatriculaAdmin(admin.ModelAdmin):
+    pass
+
+
+class MatriculaAdmin(admin.ModelAdmin):
+    pass
+
+
+admin.site.register(User, UserAdmin)
+admin.site.register(Endereco, EnderecoAdmin)
+admin.site.register(Tipo, TipoAdmin)
+admin.site.register(Contato, ContatoAdmin)
+admin.site.register(Empresa, EmpresaAdmin)
+admin.site.register(Setor, SetorAdmin)
+admin.site.register(Setor_User, SetorUserAdmin)
+admin.site.register(Tipo_Matricula, TipoMatriculaAdmin)
+admin.site.register(Matricula, MatriculaAdmin)

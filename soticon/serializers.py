@@ -14,7 +14,7 @@ class UserSoticonSerializer(serializers.ModelSerializer):
     usuario = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
     def get_nome(self, obj):
-        nome = User.objects.get(id=obj.user).nome
+        nome = User.objects.get(id=obj.usuario.id).nome
         return nome
 
 
@@ -29,7 +29,7 @@ class StrikeSerializer(serializers.ModelSerializer):
     nome = serializers.SerializerMethodField()
 
     def get_nome(self, obj):
-        nome = User.objects.get(id=obj.user).nome
+        nome = User.objects.get(id=obj.usuario.id).nome
         return nome
 
 
@@ -71,3 +71,7 @@ class RegrasSerializer(serializers.ModelSerializer):
     class Meta:
         model = Regras
         fields = "__all__"
+
+
+class ReservarTicketSerializer(serializers.Serializer):
+    rota = serializers.IntegerField()

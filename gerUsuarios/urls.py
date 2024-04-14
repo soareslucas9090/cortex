@@ -16,5 +16,5 @@ blog_router.register("matriculas", MatriculaViewSet)
 
 
 urlpatterns = [
-    path("v1/", include(blog_router.urls)),
+    path("", include(blog_router.urls)),
 ]
