@@ -43,7 +43,7 @@ class EnderecoViewSet(ModelViewSet):
     queryset = Endereco.objects.all()
     serializer_class = EnderecoSerializer
     permission_classes = [
-        AllowAny,
+        IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -58,7 +58,7 @@ class ContatoViewSet(ModelViewSet):
     queryset = Contato.objects.all()
     serializer_class = ContatoSerializer
     permission_classes = [
-        AllowAny,
+        IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -90,7 +90,7 @@ class EmpresaViewSet(ModelViewSet):
     queryset = Empresa.objects.all()
     serializer_class = EmpresaSerializer
     permission_classes = [
-        AllowAny,
+        IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -122,7 +122,7 @@ class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [
-        AllowAny,
+        IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -180,7 +180,7 @@ class SetorViewSet(ModelViewSet):
     queryset = Setor.objects.all()
     serializer_class = SetorSerializer
     permission_classes = [
-        AllowAny,
+        IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -232,7 +232,7 @@ class TipoMatriculaViewSet(ModelViewSet):
     queryset = Tipo_Matricula.objects.all()
     serializer_class = Tipo_MatriculaSerializer
     permission_classes = [
-        AllowAny,
+        IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -258,7 +258,7 @@ class MatriculaViewSet(ModelViewSet):
     queryset = Matricula.objects.all()
     serializer_class = MatriculaSerializer
     permission_classes = [
-        AllowAny,
+        IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
