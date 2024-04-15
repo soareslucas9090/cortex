@@ -65,56 +65,71 @@ Rotas para o APP gerUsuarios, cujo caminho é host/api/gerusuarios/v1/
             Remove um endereço existente.
 
 
-        Contatos:
-            GET /contatos/
-                Retorna todos os contatos.
+    Contatos:
+        GET /contatos/
+            Retorna todos os contatos.
 
-            GET /contatos/?email=x
-                Retorna o contato com o email = x.
+        GET /contatos/?email=x
+            Retorna o contato com o email = x.
 
-            GET /contatos/?tel=x
-                Retorna o contato com o email = x.
-            
-            GET /contatos/{id}
+        GET /contatos/?tel=x
+            Retorna o contato com o email = x.
+        
+        GET /contatos/{id}
+        Retorna o objeto de pk = id.
+
+        POST /contatos/
+            Cria um novo contato.
+            Parâmetros necessários:
+                endereco (inteiro): O ID do endereço associado ao contato.
+                email (string): O email do contato.
+                tel (string): O telefone do contato.
+            Parâmetros opcionais:
+                is_ativo (boolean): status de "ativo" do endereco
+
+        PATCH /contatos/{id}/
+            Atualiza um contato existente.
+            Parâmetros necessários:
+                endereco (inteiro): O novo ID do endereço associado ao contato.
+                email (string): O novo email do contato.
+                tel (string): O novo telefone do contato.
+            Parâmetros opcionais:
+                is_ativo (boolean): status de "ativo" do endereco
+
+        DELETE /contatos/{id}/
+            Remove um contato existente.
+
+
+    Empresas
+        GET /empresas/
+            Retorna todas as empresas.
+
+        GET /empresas/?nome=x
+            Retorna o contato com o nome = x.
+
+        GET /empresas/?cnpj=x
+            Retorna o contato com o cnpj = x.
+
+        GET /empresas/{id}
             Retorna o objeto de pk = id.
 
-            POST /contatos/
-                Cria um novo contato.
-                Parâmetros necessários:
-                    endereco (inteiro): O ID do endereço associado ao contato.
-                    email (string): O email do contato.
-                    tel (string): O telefone do contato.
-                Parâmetros opcionais:
-                    is_ativo (boolean): status de "ativo" do endereco
-
-            PATCH /contatos/{id}/
-                Atualiza um contato existente.
-                Parâmetros necessários:
-                    endereco (inteiro): O novo ID do endereço associado ao contato.
-                    email (string): O novo email do contato.
-                    tel (string): O novo telefone do contato.
-                Parâmetros opcionais:
-                    is_ativo (boolean): status de "ativo" do endereco
-
-            DELETE /contatos/{id}/
-                Remove um contato existente.
-Empresas
-GET /empresas/
-Retorna todas as empresas.
-POST /empresas/
-Cria uma nova empresa.
-Parâmetros necessários:
-contato (inteiro): O ID do contato associado à empresa.
-nome (string): O nome da empresa.
-cnpj (string): O CNPJ da empresa.
-PATCH /empresas/{id}/
-Atualiza uma empresa existente.
-Parâmetros necessários:
-contato (inteiro): O novo ID do contato associado à empresa.
-nome (string): O novo nome da empresa.
-cnpj (string): O novo CNPJ da empresa.
-DELETE /empresas/{id}/
-Remove uma empresa existente.
+        POST /empresas/
+            Cria uma nova empresa.
+            Parâmetros necessários:
+                contato (inteiro): O ID do contato associado à empresa.
+                nome (string): O nome da empresa.
+                cnpj (string): O CNPJ da empresa.
+            Parâmetros opcionais:
+                is_ativo (boolean): status de "ativo" do endereco
+                
+        PATCH /empresas/{id}/
+        Atualiza uma empresa existente.
+        Parâmetros necessários:
+        contato (inteiro): O novo ID do contato associado à empresa.
+        nome (string): O novo nome da empresa.
+        cnpj (string): O novo CNPJ da empresa.
+        DELETE /empresas/{id}/
+        Remove uma empresa existente.
 Usuários
 GET /users/
 Retorna todos os usuários.
