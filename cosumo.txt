@@ -1,0 +1,35 @@
+Rotas para o token do cortex, cujo caminho é host/api/
+Só possível requisição POST
+
+    Token:
+        POST token/
+            Cria um novo token pra qualquer usuário válido
+            Parâmetros necessários:
+                "cpf" - {string}:
+                "password - {string}":
+            -Retorna "Usuario ou senha inválido" caso o usuário/senha
+            não seja válido.
+
+            -Retorna "token"{string}: / "refresh"{string} caso o
+            usuário seja válido.
+
+        POST token/refesh/
+            -Cria um novo token para um usuário que já tenha um token
+            de refresh
+            Parâmetros necessários:
+                "refresh"{string}:
+            -Retorna "Refresh inválido" caso o token refresh fornecido
+            não seja válido.
+
+            Retorna "token"{string}: caso o token refresh seja válido
+
+        POST token/verify/
+            Verifica se o token fornecido é válido
+            Parâmetros necessários:
+                "token"{string}:
+            
+            Não retorna nada no body se o token for válido
+
+            -Retorna "token não válido" se o token fornecido não for
+            válido.
+
