@@ -30,6 +30,20 @@ DEBUG = debug
 
 ALLOWED_HOSTS = allowedHosts
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8080",
+    "http://127.0.0.1:8000",
+]
+
+CORS_ALLOW_ALL_ORIGINS: False
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
+CORS_ALLOW_METHODS = ["*"]
+
 AUTH_USER_MODEL = "gerUsuarios.User"
 ACCOUNT_AUTHENTICATION_METHOD = "cpf"
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
@@ -46,6 +60,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     "debug_toolbar",
     "rest_framework_simplejwt",
     "rest_framework",
@@ -62,6 +77,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
 ]
 
 ROOT_URLCONF = "cortex.urls"
