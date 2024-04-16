@@ -32,6 +32,7 @@ ALLOWED_HOSTS = allowedHosts
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
+    "http://192.168.18.69:5500"
     
 ]
 
