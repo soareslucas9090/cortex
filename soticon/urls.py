@@ -10,6 +10,7 @@ soticon_router.register("justificativas", JustificativaViewSet)
 soticon_router.register("posicoes", PosicaoFilaViewSet)
 soticon_router.register("rotas", RotaViewSet)
 soticon_router.register("tickets", TicketsViewSet)
+soticon_router.register("verificar_tickets", VerificarTickets, basename="verificar_tickets")
 
 urlpatterns = [
     path("", include(soticon_router.urls)),
