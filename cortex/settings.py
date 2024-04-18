@@ -60,8 +60,10 @@ else:
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
+    "http://127.0.0.1:3000",
     "http://192.168.18.69:5500",
     "http://localhost:5500",
+    "http://127.0.0.1:5500",
     "https://cortexfront.web.app",
 ]
 
@@ -70,6 +72,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
     "http://192.168.18.69:5500",
     "http://localhost:5500",
+    "http://127.0.0.1:5500",
     "https://cortexfront.web.app",
     "aws-0-sa-east-1.pooler.supabase.com",
     "cortex-r9o8.onrender.com",
@@ -78,8 +81,10 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_ALL_ORIGINS: False
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "http://127.0.0.1:3000",
     "http://192.168.18.69:5500",
     "http://localhost:5500",
+    "http://127.0.0.1:5500",
     "https://cortexfront.web.app",
 ]
 CORS_ALLOW_METHODS = ["*"]
