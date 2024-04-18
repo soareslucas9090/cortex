@@ -1,8 +1,6 @@
 import os
 from datetime import timedelta
 
-from .env import *
-
 REST_FRAMEWORK = {
     # Autenticação por seção está comentada pois foi implementada a por token, mas pode ter as duas
     "DEFAULT_AUTHENTICATION_CLASSES": (
