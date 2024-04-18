@@ -65,6 +65,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5500",
     "http://127.0.0.1:5500",
     "https://cortexfront.web.app",
+    "https://web-5gnex1an3lly.up-us-nyc1-k8s-1.apps.run-on-seenode.com",
+    "https://cloud.seenode.com",
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -76,6 +78,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://cortexfront.web.app",
     "aws-0-sa-east-1.pooler.supabase.com",
     "cortex-r9o8.onrender.com",
+    "https://web-5gnex1an3lly.up-us-nyc1-k8s-1.apps.run-on-seenode.com",
+    "https://cloud.seenode.com",
 ]
 
 CORS_ALLOW_ALL_ORIGINS: False
@@ -86,6 +90,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5500",
     "http://127.0.0.1:5500",
     "https://cortexfront.web.app",
+    "https://web-5gnex1an3lly.up-us-nyc1-k8s-1.apps.run-on-seenode.com",
+    "https://cloud.seenode.com",
 ]
 CORS_ALLOW_METHODS = ["*"]
 
