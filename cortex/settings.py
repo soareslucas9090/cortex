@@ -47,6 +47,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5500",
     "https://cortexfront.web.app",
     "aws-0-sa-east-1.pooler.supabase.com",
+    "cortex-r9o8.onrender.com",
 ]
 
 CORS_ALLOW_ALL_ORIGINS: False
