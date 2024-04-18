@@ -24,14 +24,45 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = secretKeyDjango
+
+
 SECRET_KEY = os.environ.get("secretKeyDjango")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = debug
-DEBUG = os.environ.get("debugMode")
+if SECRET_KEY:
+    DEBUG = os.environ.get("debugMode")
+    ALLOWED_HOSTS = [os.environ.get("allowedHosts")]
+    DATABASES = {
+        "default": {
+            "ENGINE": os.environ.get("bdEngine"),
+            "NAME": os.environ.get("bdName"),
+            "USER": os.environ.get("bdUser"),
+            "PASSWORD": os.environ.get("bdPass"),
+            "HOST": os.environ.get("bdHost"),
+            "PORT": os.environ.get("bdPort"),
+        }
+    }
+else:
+    from .env import *
 
-# ALLOWED_HOSTS = allowedHosts
-ALLOWED_HOSTS = [os.environ.get("allowedHosts")]
+    DEBUG = debug
+    ALLOWED_HOSTS = allowedHosts
+    DATABASES = {
+        "default": {
+            "ENGINE": bdEngine,
+            "NAME": bdName,
+            "USER": bdUser,
+            "PASSWORD": bdPass,
+            "HOST": bdHost,
+            "PORT": bdPort,
+        }
+    }
+
+# SECURITY WARNING: don't run with debug turned on in production!
+#
+
+
+#
+
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
@@ -122,28 +153,6 @@ WSGI_APPLICATION = "cortex.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-"""
-DATABASES = {
-    "default": {
-        "ENGINE": bdEngine,
-        "NAME": bdName,
-        "USER": bdUser,
-        "PASSWORD": bdPass,
-        "HOST": bdHost,
-        "PORT": bdPort,
-    }
-}
-"""
-DATABASES = {
-    "default": {
-        "ENGINE": os.environ.get("bdEngine"),
-        "NAME": os.environ.get("bdName"),
-        "USER": os.environ.get("bdUser"),
-        "PASSWORD": os.environ.get("bdPass"),
-        "HOST": os.environ.get("bdHost"),
-        "PORT": os.environ.get("bdPort"),
-    }
-}
 
 
 # Password validation
