@@ -1,3 +1,4 @@
+import os
 from datetime import timedelta
 
 from .env import *
@@ -27,7 +28,7 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "BLACKLIST_AFTER_ROTATION": False,
-    "SIGNING_KEY": secretKeyJWT,
+    "SIGNING_KEY": os.environ.get("secretKeyJWT"),
     "AUTH_HEADER_TYPES": ("Bearer",),
     "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
     "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",

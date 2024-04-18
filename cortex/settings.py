@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 from .env import *
@@ -23,12 +24,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = secretKeyDjango
+# SECRET_KEY = secretKeyDjango
+SECRET_KEY = os.environ.get("secretKeyDjango")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = debug
+# DEBUG = debug
+DEBUG = os.environ.get("debugMode")
 
-ALLOWED_HOSTS = allowedHosts
+# ALLOWED_HOSTS = allowedHosts
+ALLOWED_HOSTS = [os.environ.get("allowedHosts")]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
@@ -118,7 +122,7 @@ WSGI_APPLICATION = "cortex.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
+"""
 DATABASES = {
     "default": {
         "ENGINE": bdEngine,
@@ -127,6 +131,17 @@ DATABASES = {
         "PASSWORD": bdPass,
         "HOST": bdHost,
         "PORT": bdPort,
+    }
+}
+"""
+DATABASES = {
+    "default": {
+        "ENGINE": os.environ.get("bdEngine"),
+        "NAME": os.environ.get("bdName"),
+        "USER": os.environ.get("bdUser"),
+        "PASSWORD": os.environ.get("bdPass"),
+        "HOST": os.environ.get("bdHost"),
+        "PORT": os.environ.get("bdPort"),
     }
 }
 
