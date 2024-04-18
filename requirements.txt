@@ -6,6 +6,7 @@ django-debug-toolbar==4.3.0
 djangorestframework==3.15.1
 djangorestframework-simplejwt==5.3.1
 exceptiongroup==1.2.0
+gunicorn==22.0.0
 iniconfig==2.0.0
 packaging==24.0
 pluggy==1.4.0
