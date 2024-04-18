@@ -23,7 +23,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = secretKeyDjango
 
 
 SECRET_KEY = os.environ.get("secretKeyDjango")
@@ -44,6 +43,7 @@ if SECRET_KEY:
 else:
     from .env import *
 
+    SECRET_KEY = secretKeyDjango
     DEBUG = debug
     ALLOWED_HOSTS = allowedHosts
     DATABASES = {
@@ -56,12 +56,6 @@ else:
             "PORT": bdPort,
         }
     }
-
-# SECURITY WARNING: don't run with debug turned on in production!
-#
-
-
-#
 
 
 CSRF_TRUSTED_ORIGINS = [
