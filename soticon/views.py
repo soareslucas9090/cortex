@@ -93,7 +93,7 @@ class RotaViewSet(ModelViewSet):
     queryset = Rota.objects.all()
     serializer_class = RotaSerializer
     permission_classes = [
-        IsAuthenticated,
+        AllowAny,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -116,7 +116,9 @@ class RotaViewSet(ModelViewSet):
             data_formatada = None
 
         if data_formatada:
-            return queryset.filter(data__date=data_formatada.date())
+            print(data_formatada)
+            print(data_formatada)
+            return queryset.filter(data=data_formatada)
 
         return queryset
 
