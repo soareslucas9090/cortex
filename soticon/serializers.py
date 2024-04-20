@@ -62,11 +62,11 @@ class TicketsSerializer(serializers.ModelSerializer):
     cpf = serializers.SerializerMethodField()
 
     def get_nome(self, obj):
-        nome = User.objects.get(id=obj.usuario.id).nome
+        nome = User.objects.get(id=obj.user_soticon.id).nome
         return nome
 
     def get_cpf(self, obj):
-        cpf = User.objects.get(id=obj.usuario.id).cpf
+        cpf = User.objects.get(id=obj.user_soticon.id).cpf
         return cpf
 
     rota = serializers.PrimaryKeyRelatedField(queryset=Rota.objects.all())
