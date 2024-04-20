@@ -58,6 +58,17 @@ class TicketsSerializer(serializers.ModelSerializer):
         model = Tickets
         fields = "__all__"
 
+    nome = serializers.SerializerMethodField()
+    cpf = serializers.SerializerMethodField()
+
+    def get_nome(self, obj):
+        nome = User.objects.get(id=obj.usuario.id).nome
+        return nome
+
+    def get_cpf(self, obj):
+        cpf = User.objects.get(id=obj.usuario.id).cpf
+        return cpf
+
     rota = serializers.PrimaryKeyRelatedField(queryset=Rota.objects.all())
     user_soticon = serializers.PrimaryKeyRelatedField(
         queryset=UserSoticon.objects.all()
