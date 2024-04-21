@@ -17,35 +17,54 @@ class UserSoticonViewSet(ModelViewSet):
     queryset = UserSoticon.objects.all()
     serializer_class = UserSoticonSerializer
     permission_classes = [
-        AllowAny,
+        IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        usuario = self.request.query_params.get("usuario", None)
-
-        if usuario:
-            queryset = queryset.filter(usuario=usuario)
-            return queryset
-
-        return queryset
-
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
+        return self.listarTicketsDoUsuario(instance)
+
+    def list(self, request, *args, **kwargs):
+        usuario = self.request.query_params.get("usuario", None)
+        if usuario:
+            queryset = super().get_queryset()
+            queryset = queryset.get(usuario=usuario)
+            print(queryset)
+            return self.listarTicketsDoUsuario(queryset)
+
+        else:
+            return super().list(request, *args, **kwargs)
+
+    def listarTicketsDoUsuario(self, instance):
         serializer = self.get_serializer(instance)
 
         data_atual = date.today()
         ticket_reservado = Tickets.objects.filter(
-            Q(user_soticon=instance, reservado=True) & Q(rota__data=data_atual)
-        ).first()
-
+            Q(user_soticon=instance, reservado=True, usado=False)
+            & Q(rota__data=data_atual)
+        )
         if ticket_reservado:
             serializer_data = serializer.data
-            serializer_data["ticket_reservado"] = (
-                ticket_reservado.posicao_fila.num_ticket
-            )
+            tickets_reservado = []
+
+            for ticket in ticket_reservado:
+
+                ticket_data = {
+                    "rota": [
+                        {
+                            "id": ticket.rota.id,
+                            "status": ticket.rota.status,
+                            "data": ticket.rota.data,
+                            "horario": ticket.rota.horario,
+                        }
+                    ],
+                    "num_ticket": ticket.posicao_fila.num_ticket,
+                }
+                tickets_reservado.append(ticket_data)
+
+            serializer_data["tickets_reservado"] = tickets_reservado
+
             return Response(serializer_data)
         else:
             return Response(serializer.data)
@@ -75,7 +94,7 @@ class JustificativaViewSet(ModelViewSet):
     queryset = Justificativa.objects.all()
     serializer_class = JustificativaSerializer
     permission_classes = [
-        AllowAny,
+        IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -84,7 +103,7 @@ class PosicaoFilaViewSet(ModelViewSet):
     queryset = PosicaoFila.objects.all()
     serializer_class = PosicaoFilaSerializer
     permission_classes = [
-        AllowAny,
+        IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -93,7 +112,7 @@ class RotaViewSet(ModelViewSet):
     queryset = Rota.objects.all()
     serializer_class = RotaSerializer
     permission_classes = [
-        AllowAny,
+        IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
