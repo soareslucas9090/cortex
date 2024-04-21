@@ -11,10 +11,12 @@ Retorna todos os usuários.
 ### GET /users/{id}
 
 Retorna o objeto de usuário com o ID especificado.
+Retorna junto as informações de tickets reservado e não usados para a data atual.
 
 ### GET /users/?usuario=x
 
 Retorna o user_soticon com o user = x.
+Retorna junto as informações de tickets reservado e não usados para a data atual.
 
 ### POST /users/
 
