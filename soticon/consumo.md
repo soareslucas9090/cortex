@@ -12,6 +12,10 @@ Retorna todos os usuários.
 
 Retorna o objeto de usuário com o ID especificado.
 
+### GET /users/?usuario=x
+
+Retorna o user_soticon com o user = x.
+
 ### POST /users/
 
 Cria um novo usuário.
