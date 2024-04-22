@@ -126,6 +126,8 @@ class RotaViewSet(ModelViewSet):
             queryset = queryset.filter(status=status)
             return queryset
 
+        ######## Filtro de data geral ########
+
         data = self.request.query_params.get("data")
         format = "%Y-%m-%d"
         data_formatada = None
@@ -136,9 +138,20 @@ class RotaViewSet(ModelViewSet):
             data_formatada = None
 
         if data_formatada:
-            print(data_formatada)
-            print(data_formatada)
             return queryset.filter(data=data_formatada)
+
+        ######## Filtro de data para rotas válidas para agendamento ########
+
+        data_valida = self.request.query_params.get("data_valida")
+        data_valida_formatada = None
+
+        try:
+            data_valida_formatada = datetime.strptime(data_valida, format)
+        except:
+            data_valida_formatada = None
+
+        if data_valida_formatada:
+            return queryset.filter(data=data_valida_formatada, status="espera")
 
         return queryset
 
