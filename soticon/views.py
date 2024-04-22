@@ -234,45 +234,46 @@ class ReservarTickets(GenericViewSet, CreateModelMixin):
             )
 
 
-class VerificarTickets(GenericViewSet, CreateModelMixin):
+class VerificarTickets(ModelViewSet, UpdateModelMixin):
     queryset = Tickets.objects.all()
     serializer_class = TicketsSerializer
-    http_method_names = ["get"]
+    http_method_names = ["put"]
+    permission_classes = [AllowAny]
 
-    def list(self, request, *args, **kwargs):
-        try:
-            user_soticon = request.data.get("user_soticon")
-            rota_id = request.data.get("rota")
-
+    def get_object(self, request):
+        if "user_soticon" and "rota" in request.data:
             try:
-                usuario_soticon = UserSoticon.objects.get(pk=user_soticon)
-            except UserSoticon.DoesNotExist:
-                return Response("Usuário não encontrado", status=404)
+                user_soticon = request.data.get("user_soticon")
+                rota_id = request.data.get("rota")
+                
+                try:
 
-            try:
-                rota_soticon = Rota.objects.get(pk=rota_id)
-            except Rota.DoesNotExist:
-                return Response("Rota não localizada!", status=404)
+                    usuario_soticon = UserSoticon.objects.get(pk=user_soticon)
+                    rota_soticon = Rota.objects.get(pk=rota_id)
 
-            reserva = Tickets.objects.filter(
-                user_soticon=user_soticon, rota=rota_soticon, usado=False
-            )
+                    reserva = Tickets.objects.filter(user_soticon=user_soticon, rota=rota_id, usado=False).first()
+                    return reserva
+                
+                except UserSoticon.DoesNotExist:
+                    return Response("Usuário não localizado!", status=404)
 
-            if reserva.exists():
-                ticket = reserva.first()
-                ticket.usado = True
-                ticket.save()
-                serializer = self.serializer_class(ticket)
-                return Response(
-                    {"Ticket verificado com sucesso!": serializer.data}, status=200
-                )
-            else:
-                ticket_usado = Tickets.objects.filter(
-                    user_soticon=usuario_soticon, rota=rota_soticon, usado=True
-                ).first()
-                if ticket_usado:
-                    serializer = self.serializer_class(ticket_usado)
-                    return Response("Ticket já foi verificado!", status=400)
-
-        except Exception as e:
-            return Response(str(e), status=500)
+                except Rota.DoesNotExist:
+                    return Response("Rota não localizada!", status=404)
+                
+            except Exception as e:
+                print(e)
+                return Response("Erro ao realizar consulta de dados", status=500)
+        
+    
+    def put(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+    
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object(request)
+        if instance is None:
+            return Response("Usuário não possui reserva!", status=404)
+        
+        serializer = self.get_serializer(instance, data={"usado": True}, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)

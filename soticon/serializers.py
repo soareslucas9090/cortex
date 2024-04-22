@@ -74,9 +74,19 @@ class TicketsSerializer(serializers.ModelSerializer):
         queryset=UserSoticon.objects.all()
     )
     posicao_fila = serializers.PrimaryKeyRelatedField(
-        queryset=PosicaoFila.objects.all()
+        queryset=PosicaoFila.objects.all(), required=False, allow_null=True
     )
 
+    def validate(self, data):
+        if "user_soticon" not in data or "rota" not in data:
+            raise serializers.ValidationError("É obrigatório informar o id do usuário e da rota!")
+        
+        return data
+
+class SoticonTicketsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tickets
+        fields = "__all__"
 
 class RegrasSerializer(serializers.ModelSerializer):
     class Meta:
