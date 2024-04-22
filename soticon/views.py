@@ -38,6 +38,7 @@ class UserSoticonViewSet(ModelViewSet):
 
     def listarTicketsDoUsuario(self, instance):
         serializer = self.get_serializer(instance)
+        serializer.data["tickets_reservados"] = []
 
         data_atual = date.today()
         ticket_reservado = Tickets.objects.filter(
@@ -63,7 +64,7 @@ class UserSoticonViewSet(ModelViewSet):
                 }
                 tickets_reservado.append(ticket_data)
 
-            serializer_data["tickets_reservado"] = tickets_reservado
+            serializer_data["tickets_reservados"] = tickets_reservado
 
             return Response(serializer_data)
         else:
@@ -175,63 +176,70 @@ class ReservarTickets(GenericViewSet, CreateModelMixin):
         serializer.is_valid(raise_exception=True)
 
         rota = Rota.objects.get(pk=serializer.data["rota"])
-        user_soticon = UserSoticon.objects.get(usuario=request.user)
 
-        ticket_reservado = Tickets.objects.filter(
-            reservado=True, rota=rota, user_soticon=user_soticon
-        )
+        if rota.status != "espera":
 
-        if ticket_reservado:
-            Tickets.objects.update(reservado=False)
+            user_soticon = UserSoticon.objects.get(usuario=request.user)
 
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        else:
-            ticket_desreservado = (
-                Tickets.objects.filter(reservado=False, rota=rota)
-                .order_by("posicao_fila")
-                .first()
+            ticket_reservado = Tickets.objects.filter(
+                reservado=True, rota=rota, user_soticon=user_soticon
             )
 
-            serializer_data = serializer.data
+            if ticket_reservado:
+                Tickets.objects.update(reservado=False)
 
-            if ticket_desreservado:
-
-                ticket_desreservado.reservado = True
-                ticket_desreservado.user_soticon = user_soticon
-                ticket_desreservado.save()
-
-                serializer_data["posicao_fila"] = (
-                    ticket_desreservado.posicao_fila.num_ticket
-                )
+                return Response(serializer.data, status=status.HTTP_200_OK)
 
             else:
-
-                try:
-                    posicaofilaMax = (
-                        Tickets.objects.filter(rota=rota)
-                        .order_by("-posicao_fila")
-                        .first()
-                        .posicao_fila.num_ticket
-                    ) + 1
-
-                except:
-                    posicaofilaMax = 1
-
-                Tickets.objects.create(
-                    usado=False,
-                    reservado=True,
-                    posicao_fila=PosicaoFila.objects.get(pk=posicaofilaMax),
-                    rota=rota,
-                    user_soticon=user_soticon,
+                ticket_desreservado = (
+                    Tickets.objects.filter(reservado=False, rota=rota)
+                    .order_by("posicao_fila")
+                    .first()
                 )
 
-                serializer_data["posicao_fila"] = posicaofilaMax
+                serializer_data = serializer.data
 
-            headers = self.get_success_headers(serializer_data)
-            return Response(
-                serializer_data, status=status.HTTP_201_CREATED, headers=headers
-            )
+                if ticket_desreservado:
+
+                    ticket_desreservado.reservado = True
+                    ticket_desreservado.user_soticon = user_soticon
+                    ticket_desreservado.save()
+
+                    serializer_data["posicao_fila"] = (
+                        ticket_desreservado.posicao_fila.num_ticket
+                    )
+
+                else:
+
+                    try:
+                        posicaofilaMax = (
+                            Tickets.objects.filter(rota=rota)
+                            .order_by("-posicao_fila")
+                            .first()
+                            .posicao_fila.num_ticket
+                        ) + 1
+
+                    except:
+                        posicaofilaMax = 1
+
+                    Tickets.objects.create(
+                        usado=False,
+                        reservado=True,
+                        posicao_fila=PosicaoFila.objects.get(pk=posicaofilaMax),
+                        rota=rota,
+                        user_soticon=user_soticon,
+                    )
+
+                    serializer_data["posicao_fila"] = posicaofilaMax
+
+                headers = self.get_success_headers(serializer_data)
+                return Response(
+                    serializer_data, status=status.HTTP_201_CREATED, headers=headers
+                )
+
+        else:
+            erro = {"Erro": "A rota não está mais disponível!"}
+            return Response(erro, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
 class VerificarTickets(ModelViewSet, UpdateModelMixin):
@@ -245,34 +253,35 @@ class VerificarTickets(ModelViewSet, UpdateModelMixin):
             try:
                 user_soticon = request.data.get("user_soticon")
                 rota_id = request.data.get("rota")
-                
+
                 try:
 
                     usuario_soticon = UserSoticon.objects.get(pk=user_soticon)
                     rota_soticon = Rota.objects.get(pk=rota_id)
 
-                    reserva = Tickets.objects.filter(user_soticon=user_soticon, rota=rota_id, usado=False).first()
+                    reserva = Tickets.objects.filter(
+                        user_soticon=user_soticon, rota=rota_id, usado=False
+                    ).first()
                     return reserva
-                
+
                 except UserSoticon.DoesNotExist:
                     return Response("Usuário não localizado!", status=404)
 
                 except Rota.DoesNotExist:
                     return Response("Rota não localizada!", status=404)
-                
+
             except Exception as e:
                 print(e)
                 return Response("Erro ao realizar consulta de dados", status=500)
-        
-    
+
     def put(self, request, *args, **kwargs):
         return self.partial_update(request, *args, **kwargs)
-    
+
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object(request)
         if instance is None:
             return Response("Usuário não possui reserva!", status=404)
-        
+
         serializer = self.get_serializer(instance, data={"usado": True}, partial=True)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
