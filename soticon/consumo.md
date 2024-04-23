@@ -153,7 +153,12 @@ Retorna todos as rotas com status = x.
 ### GET /rotas/?data=x
 
 Retorna todos as rotas com a data = x.
-- O formato  da data é "YYYY-MM-DD"
+- O formato da data é "YYYY-MM-DD"
+
+### GET /rotas/?data_valida=x
+
+Retorna todos as rotas validas para agendamento (status="espera") com a data = x.
+- O formato da data é "YYYY-MM-DD"
 
 ### POST /rotas/
 
@@ -194,6 +199,10 @@ Retorna o objeto de ticket com o ID especificado.
 
 Retorna todos os tickets com a rota = x.
 
+### GET /tickets/?usuario=x
+
+Retorna todos os tickets reservados e não usados para as rotas do dia do user_soticon = x.
+
 ### POST /tickets/
 
 Cria um novo ticket.
@@ -227,7 +236,7 @@ Exclui um ticket existente.
 
 Reserva um ticket para um usuário, ou desreserva caso tenha um ticket reservado.
 - Parâmetros necessários:
-  - rota (inteiro): O ID da rota para a qual o ticket está sendo reservado/desreservado.
+  - rota (inteiro): O ID da rota para a qual o ticket está sendo reservado/desreservado (o status da rota deve ser "espera").
   - user_soticon (inteiro): O ID do usuario para o qual o ticket está sendo reservado/desreservado.
 - Acesso apenas para usuários autenticados.
 
