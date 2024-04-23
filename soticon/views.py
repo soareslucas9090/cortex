@@ -173,6 +173,15 @@ class TicketsViewSet(ModelViewSet):
             queryset = queryset.filter(rota=rota)
             return queryset
 
+        usuario = self.request.query_params.get("usuario", None)
+
+        if usuario:
+            data_atual = date.today()
+            queryset = queryset.filter(
+                user_soticon=usuario, usado=False, reservado=True, rota__data=data_atual
+            )
+            return queryset
+
         return queryset
 
 
