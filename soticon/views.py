@@ -113,7 +113,7 @@ class RotaViewSet(ModelViewSet):
     queryset = Rota.objects.all()
     serializer_class = RotaSerializer
     permission_classes = [
-        IsAuthenticated,
+        AllowAny,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -180,7 +180,7 @@ class ReservarTickets(GenericViewSet, CreateModelMixin):
     queryset = Tickets.objects.all()
     serializer_class = ReservarTicketSerializer
     permission_classes = [
-        IsAuthenticated,
+        AllowAny,
     ]
     http_method_names = ["post"]
 
@@ -190,7 +190,7 @@ class ReservarTickets(GenericViewSet, CreateModelMixin):
 
         rota = Rota.objects.get(pk=serializer.data["rota"])
 
-        if rota.status != "espera":
+        if rota.status == "espera":
 
             user_soticon = UserSoticon.objects.get(usuario=request.user)
 

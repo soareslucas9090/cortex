@@ -66,6 +66,9 @@ class Rota(modelsUsusarios.Base):
         str = f"{self.horario}"
         return str
 
+    class Meta:
+        ordering = ["-data"]
+
 
 class Tickets(models.Model):
     rota = models.ForeignKey(
