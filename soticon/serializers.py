@@ -52,6 +52,18 @@ class RotaSerializer(serializers.ModelSerializer):
         model = Rota
         fields = "__all__"
 
+    def validate_status(self, value):
+        status = value
+        status_aceitos = ["espera", "cancelada", "executada"]
+
+        if not (status.lower() in status_aceitos):
+            status_aceitos_str = ", ".join(status_aceitos)
+            raise serializers.ValidationError(
+                f"O status deve ser um dos seguintes: {status_aceitos_str}"
+            )
+
+        return status.lower()
+
 
 class TicketsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -79,14 +91,18 @@ class TicketsSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         if "user_soticon" not in data or "rota" not in data:
-            raise serializers.ValidationError("É obrigatório informar o id do usuário e da rota!")
-        
+            raise serializers.ValidationError(
+                "É obrigatório informar o id do usuário e da rota!"
+            )
+
         return data
+
 
 class SoticonTicketsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tickets
         fields = "__all__"
+
 
 class RegrasSerializer(serializers.ModelSerializer):
     class Meta:
