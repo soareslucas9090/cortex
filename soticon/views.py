@@ -210,8 +210,9 @@ class ReservarTickets(GenericViewSet, CreateModelMixin):
 
                 if ticket_reservado:
                     Tickets.objects.update(reservado=False)
-
-                    return Response(serializer.data, status=status.HTTP_200_OK)
+                    serializer_data = {"Resultado": "Ticket desreservado"}
+                    serializer_data.update(serializer.data)
+                    return Response(serializer_data, status=status.HTTP_200_OK)
 
                 else:
                     ticket_desreservado = (
@@ -220,7 +221,8 @@ class ReservarTickets(GenericViewSet, CreateModelMixin):
                         .first()
                     )
 
-                    serializer_data = serializer.data
+                    serializer_data = {"Resultado": "Ticket reservado"}
+                    serializer_data.update(serializer.data)
 
                     if ticket_desreservado:
 

@@ -232,7 +232,7 @@ Exclui um ticket existente.
 
 ## Reservar Ticket
 
-### POST /reservarticket/
+### POST /reservar_ticket/
 
 Reserva um ticket para um usuário, ou desreserva caso tenha um ticket reservado.
 - Parâmetros necessários:
@@ -242,7 +242,7 @@ Reserva um ticket para um usuário, ou desreserva caso tenha um ticket reservado
 
 ## Verificar Tickets
 
-### GET /verificar_tickets/
+### PUT /verificar_tickets/
 
 Verifica um ticket para um usuário.
 - Parâmetros necessários:
