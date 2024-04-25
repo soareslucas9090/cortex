@@ -199,6 +199,10 @@ Retorna o objeto de ticket com o ID especificado.
 
 Retorna todos os tickets com a rota = x.
 
+### GET /tickets/?rota_valida=x
+
+Retorna todos os tickets válidos (reservado=True) com a rota = x.
+
 ### GET /tickets/?usuario=x
 
 Retorna todos os tickets reservados e não usados para as rotas do dia do user_soticon = x.
