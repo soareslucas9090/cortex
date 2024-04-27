@@ -165,9 +165,9 @@ Retorna todos as rotas validas para agendamento (status="espera") com a data = x
 Cria uma nova rota.
 - Parâmetros necessários:
   - obs (string): Detalhes sobre a rota.
-  - data (string): O data da rota.
+  - data (string): O data da rota (formato YYYY:MM:DD).
   - status (string): O status da rota.
-  - horario (string): O horário da horario.
+  - horario (string): O horário da horario (formato HH:MM).
 - Acesso apenas para usuários autenticados do tipo Admin ou TI.
 
 ### PATCH /rotas/{id}/
@@ -175,9 +175,9 @@ Cria uma nova rota.
 Atualiza uma rota existente.
 - Parâmetros opcionais (ao menos um):
   - obs (string): Detalhes sobre a rota.
-  - data (string): O data da rota.
+  - data (string): O data da rota (formato YYYY:MM:DD).
   - status (string): O status da rota.
-  - horario (string): O horário da horario.
+  - horario (string): O horário da horario (formato HH:MM).
 - Acesso apenas para usuários autenticados do tipo Admin ou TI.
 
 ### DELETE /rotas/{id}/

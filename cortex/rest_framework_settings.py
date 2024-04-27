@@ -13,12 +13,9 @@ REST_FRAMEWORK = {
     # Paginação
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 10,
-    "DATE_INPUT_FORMATS": ["%d-%m-%y", "%d-%m-%Y", "%d/%m/%y", "%d/%m/%Y"],
+    "DATE_INPUT_FORMATS": ["%Y-%m-%d", "%d-%m-%Y", "%Y/%m/%d", "%d/%m/%Y"],
     "TIME_INPUT_FORMATS": [
-        "%d-%m-%yT%H:%M:%S",
-        "%d-%m-%YT%H:%M:%S",
-        "%d/%m/%yT%H:%M:%S",
-        "%d/%m/%YT%H:%M:%S",
+        "%H:%M",
     ],
 }
 

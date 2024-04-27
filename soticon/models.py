@@ -60,7 +60,7 @@ class Rota(modelsUsusarios.Base):
     obs = models.CharField(max_length=512)
     data = models.DateField(null=False)
     status = models.CharField(max_length=30, null=False)
-    horario = models.DateTimeField(null=False)
+    horario = models.TimeField(null=False)
 
     def __str__(self):
         str = f"{self.horario}"
