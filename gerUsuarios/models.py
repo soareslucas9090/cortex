@@ -29,6 +29,8 @@ class Tipo(Base):
 
 class Endereco(Base):
     logradouro = models.CharField(max_length=60, null=False)
+    cidade = models.CharField(max_length=60, null=False)
+    estado = models.CharField(max_length=2, null=False)
     bairro = models.CharField(max_length=30, null=False)
     cep = models.CharField(max_length=8, null=False)
     complemento = models.CharField(max_length=30, null=True)
@@ -37,6 +39,14 @@ class Endereco(Base):
     def __str__(self):
         str = f"{self.logradouro}"
         return str
+
+    def save(self, *args, **kwargs):
+        self.cidade = self.cidade.lower()
+        self.bairro = self.bairro.lower()
+        if self.complemento:
+            self.complemento = self.complemento.lower()
+        self.logradouro = self.logradouro.lower()
+        super().save(*args, **kwargs)
 
 
 class Contato(Base):
@@ -47,8 +57,12 @@ class Contato(Base):
     tel = models.CharField(max_length=11, null=False)
 
     def __str__(self):
-        str = f"{self.tel}"
+        str = f"{self.email}"
         return str
+
+    def save(self, *args, **kwargs):
+        self.email = self.email.lower()
+        super().save(*args, **kwargs)
 
 
 class Empresa(Base):
@@ -174,6 +188,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.nome
+
+    def save(self, *args, **kwargs):
+        self.nome = self.nome.lower()
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "user"

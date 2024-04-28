@@ -48,7 +48,7 @@ class EnderecoViewSet(ModelViewSet):
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
     def get_permissions(self):
-        if self.request.method in ["POST", "DELETE"]:
+        if self.request.method in ["PATCH", "DELETE"]:
             return [IsAdminOrTI()]
 
         return super().get_permissions()
@@ -80,7 +80,7 @@ class ContatoViewSet(ModelViewSet):
         return queryset
 
     def get_permissions(self):
-        if self.request.method in ["POST", "DELETE"]:
+        if self.request.method in ["PATCH", "DELETE"]:
             return [IsAdminOrTI()]
 
         return super().get_permissions()
@@ -112,7 +112,7 @@ class EmpresaViewSet(ModelViewSet):
         return queryset
 
     def get_permissions(self):
-        if self.request.method in ["POST", "PATCH", "DELETE"]:
+        if self.request.method in ["PATCH", "DELETE"]:
             return [IsAdminOrTI()]
 
         return super().get_permissions()
@@ -170,7 +170,7 @@ class UserViewSet(ModelViewSet):
         )
 
     def get_permissions(self):
-        if self.request.method in ["POST", "DELETE"]:
+        if self.request.method in ["PATCH", "DELETE"]:
             return [IsAdminOrTI()]
 
         return super().get_permissions()
@@ -196,7 +196,7 @@ class SetorViewSet(ModelViewSet):
         return queryset
 
     def get_permissions(self):
-        if self.request.method in ["POST", "PATCH", "DELETE"]:
+        if self.request.method in ["PATCH", "DELETE"]:
             return [IsAdminOrTI()]
 
         return super().get_permissions()
@@ -248,7 +248,7 @@ class TipoMatriculaViewSet(ModelViewSet):
         return queryset
 
     def get_permissions(self):
-        if self.request.method in ["POST", "PATCH", "DELETE"]:
+        if self.request.method in ["PATCH", "DELETE"]:
             return [IsAdminOrTI()]
 
         return super().get_permissions()
