@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -113,7 +113,7 @@ class RotaViewSet(ModelViewSet):
     queryset = Rota.objects.all()
     serializer_class = RotaSerializer
     permission_classes = [
-        IsAuthenticated,
+        AllowAny,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -150,8 +150,14 @@ class RotaViewSet(ModelViewSet):
         except:
             data_valida_formatada = None
 
+        horario_permitido = datetime.now() + timedelta(minutes=20)
+
         if data_valida_formatada:
-            return queryset.filter(data=data_valida_formatada, status="espera")
+            return queryset.filter(
+                data=data_valida_formatada,
+                status="espera",
+                horario__gte=horario_permitido,
+            )
 
         return queryset
 

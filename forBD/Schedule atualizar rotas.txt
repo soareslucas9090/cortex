@@ -1,0 +1,27 @@
+Função que procura por toda rota que seja de dias anteriores, ou do dia atual, mas que o horário seja
+    menor que o horário atual + 10 minutos (de tolerância):
+
+CREATE OR REPLACE FUNCTION atualizar_rotas() RETURNS VOID AS $$
+BEGIN
+    UPDATE soticon_rota
+    SET status = 'executada'
+    WHERE status = 'espera'
+    AND (
+        data < CURRENT_DATE
+        OR (data = CURRENT_DATE AND horario < CURRENT_TIMESTAMP + INTERVAL '10 minutes')
+    );
+END;
+$$ LANGUAGE plpgsql;
+
+=======================================================================================================
+Código para criar uma schedule que executa de 20 em 20 minutos e chama a função "atualizar_rotas()":
+
+SELECT cron.schedule('schedule_atualizar_rotas', '*/20 * * * *', 'SELECT atualizar_rotas()');
+
+Caso queria editar a job, use este código, substituindo XX pelo intervalo que queira que a job seja
+    executada:
+
+SELECT cron.alter_job(
+  job_id := (SELECT jobid FROM cron.job WHERE jobname = 'schedule_atualizar_rotas'),
+  schedule := '*/XX * * * *'
+);
