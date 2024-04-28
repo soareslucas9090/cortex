@@ -253,3 +253,15 @@ Verifica um ticket para um usuário.
   - user_soticon (inteiro): O ID do usuário cujo ticket está sendo verificado.
   - rota (inteiro): O ID da rota para a qual o ticket está sendo verificado.
 
+
+## Finalizar Rota
+
+### PUT /finalizar_rota/
+
+Finaliza a rota passada.
+- Parâmetros necessários:
+  - rota (inteiro): O ID da rota a ser finalizada.
+  - status (Texto): "sucesso" para a rota finalizada com sucesso ou "cancelada" para rota finalizada com erro.
+- Parâmetros opcionais:
+  - obs (Texto): Apenas para os caos de status = "cancelada". A observação com o motivo do cancelamento de rota.
+

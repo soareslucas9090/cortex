@@ -14,6 +14,7 @@ soticon_router.register("reservar_ticket", ReservarTickets, basename="reservar_t
 soticon_router.register(
     "verificar_tickets", VerificarTickets, basename="verificar_tickets"
 )
+soticon_router.register("finalizar_rota", FinalizarRota, basename="finalizar_rota")
 
 urlpatterns = [
     path("", include(soticon_router.urls)),

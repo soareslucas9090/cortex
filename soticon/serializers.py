@@ -112,3 +112,9 @@ class RegrasSerializer(serializers.ModelSerializer):
 
 class ReservarTicketSerializer(serializers.Serializer):
     rota = serializers.IntegerField()
+
+
+class FinalizarRotaSerializer(serializers.Serializer):
+    rota = serializers.IntegerField(required=True)
+    status = serializers.CharField(required=True)
+    obs = serializers.CharField(required=False)

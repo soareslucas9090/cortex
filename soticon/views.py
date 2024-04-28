@@ -283,7 +283,7 @@ class ReservarTickets(GenericViewSet, CreateModelMixin):
             return Response(erro, status=status.HTTP_404_NOT_FOUND)
 
 
-class VerificarTickets(ModelViewSet, UpdateModelMixin):
+class VerificarTickets(ModelViewSet):
     queryset = Tickets.objects.all()
     serializer_class = TicketsSerializer
     http_method_names = ["put"]
@@ -327,3 +327,59 @@ class VerificarTickets(ModelViewSet, UpdateModelMixin):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data)
+
+
+class FinalizarRota(ModelViewSet):
+    queryset = Rota.objects.all()
+    serializer_class = FinalizarRotaSerializer
+    permission_classes = [
+        AllowAny,
+    ]
+    http_method_names = ["put"]
+
+    def get_object(self, request):
+        if "rota" in request.data:
+            try:
+                rota_id = request.data.get("rota")
+
+                try:
+
+                    rota_soticon = Rota.objects.get(pk=rota_id)
+
+                    rota = Rota.objects.filter(pk=rota_id)
+                    return rota
+
+                except Rota.DoesNotExist:
+                    return Response("Rota não localizada!", status=404)
+
+            except Exception as e:
+                print(e)
+                return Response("Erro ao realizar consulta de dados", status=500)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object(request)
+        if instance is None:
+            return Response("Rota não localizada", status=404)
+
+        dados = request.data
+
+        if dados["status"] == "sucesso":
+            dict_dados = {"status": "executada"}
+            instance.update(status=dict_dados["status"])
+
+        else:
+            if dados["obs"]:
+                obs = dados["obs"]
+            else:
+                obs = ""
+
+            dict_dados = {"status": "cancelada", "obs": obs}
+
+            instance.update(status=dict_dados["status"], obs=dict_dados["obs"])
+
+        return Response(
+            {"Rota finalizada": request.data.get("rota")}, status=status.HTTP_200_OK
+        )
