@@ -8,7 +8,7 @@ BEGIN
     WHERE status = 'espera'
     AND (
         data < CURRENT_DATE
-        OR (data = CURRENT_DATE AND horario < CURRENT_TIMESTAMP + INTERVAL '10 minutes')
+        OR (data = CURRENT_DATE AND horario < CURRENT_TIME + INTERVAL '10 minutes')
     );
 END;
 $$ LANGUAGE plpgsql;
