@@ -287,18 +287,18 @@ class VerificarTickets(ModelViewSet):
     queryset = Tickets.objects.all()
     serializer_class = TicketsSerializer
     http_method_names = ["put"]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_object(self, request):
         if "user_soticon" and "rota" in request.data:
             try:
                 user_soticon = request.data.get("user_soticon")
                 rota_id = request.data.get("rota")
-
+                print(user_soticon, rota_id)
                 try:
 
-                    usuario_soticon = UserSoticon.objects.get(pk=user_soticon)
-                    rota_soticon = Rota.objects.get(pk=rota_id)
+                    UserSoticon.objects.get(pk=user_soticon)
+                    Rota.objects.get(pk=rota_id)
 
                     reserva = Tickets.objects.filter(
                         user_soticon=user_soticon, rota=rota_id, usado=False

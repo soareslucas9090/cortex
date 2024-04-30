@@ -89,13 +89,14 @@ class TicketsSerializer(serializers.ModelSerializer):
         queryset=PosicaoFila.objects.all(), required=False, allow_null=True
     )
 
-    def validate(self, data):
-        if "user_soticon" not in data or "rota" not in data:
-            raise serializers.ValidationError(
-                "É obrigatório informar o id do usuário e da rota!"
-            )
+    # def validate(self, data):
+    #     print(data)
+    #     if "user_soticon" not in data or "rota" not in data:
+    #         raise serializers.ValidationError(
+    #             "É obrigatório informar o id do usuário e da rota!"
+    #         )
 
-        return data
+    #     return data
 
 
 class SoticonTicketsSerializer(serializers.ModelSerializer):
