@@ -294,14 +294,16 @@ class VerificarTickets(ModelViewSet):
             try:
                 user_soticon = request.data.get("user_soticon")
                 rota_id = request.data.get("rota")
-                print(user_soticon, rota_id)
                 try:
 
                     UserSoticon.objects.get(pk=user_soticon)
                     Rota.objects.get(pk=rota_id)
 
                     reserva = Tickets.objects.filter(
-                        user_soticon=user_soticon, rota=rota_id, usado=False
+                        user_soticon=user_soticon,
+                        rota=rota_id,
+                        usado=False,
+                        reservado=True,
                     ).first()
                     return reserva
 
