@@ -24,7 +24,7 @@ class StrikeSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     user_soticon = serializers.PrimaryKeyRelatedField(
-        queryset=UserSoticon.objects.all()
+        queryset=UserSoticon.objects.select_related("usuario").all()
     )
     nome = serializers.SerializerMethodField()
 
@@ -70,33 +70,47 @@ class TicketsSerializer(serializers.ModelSerializer):
         model = Tickets
         fields = "__all__"
 
-    nome = serializers.SerializerMethodField()
-    cpf = serializers.SerializerMethodField()
-
-    def get_nome(self, obj):
-        nome = User.objects.get(id=obj.user_soticon.id).nome
-        return nome
-
-    def get_cpf(self, obj):
-        cpf = User.objects.get(id=obj.user_soticon.id).cpf
-        return cpf
-
     rota = serializers.PrimaryKeyRelatedField(queryset=Rota.objects.all())
     user_soticon = serializers.PrimaryKeyRelatedField(
-        queryset=UserSoticon.objects.all()
+        queryset=UserSoticon.objects.select_related("usuario").all()
     )
     posicao_fila = serializers.PrimaryKeyRelatedField(
         queryset=PosicaoFila.objects.all(), required=False, allow_null=True
     )
 
-    # def validate(self, data):
-    #     print(data)
-    #     if "user_soticon" not in data or "rota" not in data:
-    #         raise serializers.ValidationError(
-    #             "É obrigatório informar o id do usuário e da rota!"
-    #         )
 
-    #     return data
+class TicketsDetalhadosSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tickets
+        fields = "__all__"
+
+    nome = serializers.SerializerMethodField()
+    cpf = serializers.SerializerMethodField()
+    usuario = None
+
+    def get_nome(self, obj):
+        if self.usuario:
+            return self.usuario.nome
+        else:
+            self.usuario = User.objects.get(id=obj.user_soticon.usuario.id)
+            nome = self.usuario.nome
+            return nome
+
+    def get_cpf(self, obj):
+        if self.usuario:
+            return self.usuario.cpf
+        else:
+            self.usuario = User.objects.get(id=obj.user_soticon.usuario.id)
+            cpf = self.usuario.cpf
+            return cpf
+
+    rota = serializers.PrimaryKeyRelatedField(queryset=Rota.objects.all())
+    user_soticon = serializers.PrimaryKeyRelatedField(
+        queryset=UserSoticon.objects.select_related("usuario").all()
+    )
+    posicao_fila = serializers.PrimaryKeyRelatedField(
+        queryset=PosicaoFila.objects.all(), required=False, allow_null=True
+    )
 
 
 class SoticonTicketsSerializer(serializers.ModelSerializer):

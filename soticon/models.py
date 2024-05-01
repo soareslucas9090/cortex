@@ -93,6 +93,9 @@ class Tickets(models.Model):
         str = f"Rota: {self.rota}, userSoticon: {self.user_soticon}"
         return str
 
+    class Meta:
+        ordering = ["rota"]
+
 
 class Regras(modelsUsusarios.Base):
     descricao = models.CharField(max_length=512, null=False)

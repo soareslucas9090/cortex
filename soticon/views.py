@@ -1,5 +1,6 @@
 from datetime import date, datetime, timedelta
 
+from django.db import connection
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -163,25 +164,29 @@ class RotaViewSet(ModelViewSet):
 
 
 class TicketsViewSet(ModelViewSet):
-    queryset = Tickets.objects.all()
+    queryset = Tickets.objects.select_related("user_soticon__usuario").all()
     serializer_class = TicketsSerializer
     permission_classes = [
-        IsAuthenticated,
+        AllowAny,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
     def get_queryset(self):
         queryset = super().get_queryset()
 
+        user = self.queryset.filter()
+
         rota = self.request.query_params.get("rota", None)
 
         if rota and rota.isnumeric():
+            serializer_class = TicketsDetalhadosSerializer
             queryset = queryset.filter(rota=rota)
             return queryset
 
         rota_valida = self.request.query_params.get("rota_valida", None)
 
         if rota_valida and rota_valida.isnumeric():
+            serializer_class = TicketsDetalhadosSerializer
             queryset = queryset.filter(rota=rota_valida, reservado=True)
             return queryset
 
@@ -195,6 +200,14 @@ class TicketsViewSet(ModelViewSet):
             return queryset
 
         return queryset
+
+    def get_serializer_class(self):
+        if self.request.query_params.get(
+            "rota_valida", None
+        ) or self.request.query_params.get("usuario", None):
+            return TicketsDetalhadosSerializer
+
+        return self.serializer_class
 
 
 class ReservarTickets(GenericViewSet, CreateModelMixin):
@@ -221,7 +234,7 @@ class ReservarTickets(GenericViewSet, CreateModelMixin):
                 )
 
                 if ticket_reservado:
-                    Tickets.objects.update(reservado=False)
+                    ticket_reservado.update(reservado=False)
                     serializer_data = {"Resultado": "Ticket desreservado"}
                     serializer_data.update(serializer.data)
                     return Response(serializer_data, status=status.HTTP_200_OK)
@@ -234,6 +247,7 @@ class ReservarTickets(GenericViewSet, CreateModelMixin):
                     )
 
                     serializer_data = {"Resultado": "Ticket reservado"}
+                    serializer_data.update({"Usuario": request.user.nome})
                     serializer_data.update(serializer.data)
 
                     if ticket_desreservado:
