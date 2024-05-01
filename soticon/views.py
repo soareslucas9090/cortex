@@ -1,10 +1,9 @@
 from datetime import date, datetime, timedelta
 
-from django.db import connection
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.mixins import CreateModelMixin, UpdateModelMixin
+from rest_framework.mixins import CreateModelMixin
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -114,7 +113,7 @@ class RotaViewSet(ModelViewSet):
     queryset = Rota.objects.all()
     serializer_class = RotaSerializer
     permission_classes = [
-        AllowAny,
+        IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -167,7 +166,7 @@ class TicketsViewSet(ModelViewSet):
     queryset = Tickets.objects.select_related("user_soticon__usuario").all()
     serializer_class = TicketsSerializer
     permission_classes = [
-        AllowAny,
+        IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -301,7 +300,7 @@ class VerificarTickets(ModelViewSet):
     queryset = Tickets.objects.all()
     serializer_class = TicketsSerializer
     http_method_names = ["put"]
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_object(self, request):
         if "user_soticon" and "rota" in request.data:
@@ -349,7 +348,7 @@ class FinalizarRota(ModelViewSet):
     queryset = Rota.objects.all()
     serializer_class = FinalizarRotaSerializer
     permission_classes = [
-        AllowAny,
+        IsAuthenticated,
     ]
     http_method_names = ["put"]
 
