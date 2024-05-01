@@ -178,14 +178,12 @@ class TicketsViewSet(ModelViewSet):
         rota = self.request.query_params.get("rota", None)
 
         if rota and rota.isnumeric():
-            serializer_class = TicketsDetalhadosSerializer
             queryset = queryset.filter(rota=rota)
             return queryset
 
         rota_valida = self.request.query_params.get("rota_valida", None)
 
         if rota_valida and rota_valida.isnumeric():
-            serializer_class = TicketsDetalhadosSerializer
             queryset = queryset.filter(rota=rota_valida, reservado=True)
             return queryset
 
