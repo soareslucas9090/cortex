@@ -87,19 +87,34 @@ class TicketsDetalhadosSerializer(serializers.ModelSerializer):
     nome = serializers.SerializerMethodField()
     cpf = serializers.SerializerMethodField()
     usuario = None
+    obj_test = None
 
     def get_nome(self, obj):
         if self.usuario:
-            return self.usuario.nome
+            if self.obj_test != obj:
+                self.obj_test = obj
+                self.usuario = User.objects.get(id=obj.user_soticon.usuario.id)
+                nome = self.usuario.nome
+                return nome
+            else:
+                return self.usuario.nome
         else:
+            self.obj_test = obj
             self.usuario = User.objects.get(id=obj.user_soticon.usuario.id)
             nome = self.usuario.nome
             return nome
 
     def get_cpf(self, obj):
         if self.usuario:
-            return self.usuario.cpf
+            if self.obj_test != obj:
+                self.obj_test = obj
+                self.usuario = User.objects.get(id=obj.user_soticon.usuario.id)
+                cpf = self.usuario.cpf
+                return cpf
+            else:
+                return self.usuario.cpf
         else:
+            self.obj_test = obj
             self.usuario = User.objects.get(id=obj.user_soticon.usuario.id)
             cpf = self.usuario.cpf
             return cpf
