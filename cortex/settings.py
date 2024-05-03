@@ -69,15 +69,7 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS: False
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:15500",
-    "http://127.0.0.1:15500",
-    "http://localhost:5500",
-    "http://127.0.0.1:5500",
-    "https://cortexfront.web.app",
-    "https://web-5gnex1an3lly.up-us-nyc1-k8s-1.apps.run-on-seenode.com",
-    "https://cloud.seenode.com",
-]
+
 CORS_ALLOW_METHODS = ["*"]
 
 AUTH_USER_MODEL = "gerUsuarios.User"
