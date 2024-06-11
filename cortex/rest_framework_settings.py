@@ -2,6 +2,7 @@ import os
 from datetime import timedelta
 
 REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     # Autenticação por seção está comentada pois foi implementada a por token, mas pode ter as duas
     "DEFAULT_AUTHENTICATION_CLASSES": (
         #'rest_framework.authentication.SessionAuthentication',
@@ -17,6 +18,13 @@ REST_FRAMEWORK = {
     "TIME_INPUT_FORMATS": [
         "%H:%M",
     ],
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Cortex",
+    "DESCRIPTION": "",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 signing = os.environ.get("secretKeyJWT")

@@ -90,6 +90,8 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "rest_framework_simplejwt",
     "rest_framework",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
     "gerUsuarios",
     "soticon",
     "ouvidoria",

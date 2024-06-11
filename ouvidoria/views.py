@@ -1,13 +1,10 @@
-from datetime import date, datetime, timedelta
+from datetime import datetime
 
-from django.db.models import Q
-from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import status
-from rest_framework.mixins import CreateModelMixin
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from rest_framework.viewsets import ModelViewSet
 
 from .models import *
 from .permissions import *
@@ -21,6 +18,20 @@ class StatusReclamacaoViewSet(ModelViewSet):
         IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="descricao",
+                type=OpenApiTypes.STR,
+                description="Filtra os resultados pela descrição",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = super().get_queryset()
