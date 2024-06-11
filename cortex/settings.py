@@ -92,6 +92,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "gerUsuarios",
     "soticon",
+    "ouvidoria",
 ]
 
 MIDDLEWARE = [

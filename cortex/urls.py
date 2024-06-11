@@ -30,5 +30,6 @@ urlpatterns = [
     path("api/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
     path("api/gerusuarios/v1/", include("gerUsuarios.urls")),
     path("api/soticon/v1/", include("soticon.urls")),
+    path("api/ouvidoria/v1/", include("ouvidoria.urls")),
     path("__debug__/", include("debug_toolbar.urls")),
 ]
