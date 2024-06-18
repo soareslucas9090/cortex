@@ -55,7 +55,7 @@ class Reclamacao(models.Model):
         TipoReclamacao, on_delete=models.RESTRICT, null=False
     )
     bloco = models.ForeignKey(Bloco, on_delete=models.RESTRICT, null=False)
-    usuario = models.OneToOneField(
+    usuario = models.ForeignKey(
         modelsUsusarios.User,
         related_name="user_ouvidoria",
         on_delete=models.CASCADE,
