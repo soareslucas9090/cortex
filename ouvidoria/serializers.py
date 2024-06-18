@@ -36,8 +36,8 @@ class ReclamacaoSerializer(serializers.ModelSerializer):
         queryset=TipoReclamacao.objects.all()
     )
     bloco = serializers.PrimaryKeyRelatedField(queryset=Bloco.objects.all())
-    nomeUsurio = serializers.SerializerMethodField()
+    nomeUsuario = serializers.SerializerMethodField()
 
-    def get_nome(self, obj):
+    def get_nomeUsuario(self, obj):
         nome = User.objects.get(id=obj.usuario.id).nome
         return nome
