@@ -122,7 +122,7 @@ class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [
-        AllowAny,
+        IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -192,7 +192,7 @@ class SetorViewSet(ModelViewSet):
         if nome:
             queryset = queryset.filter(nome=nome)
             return queryset
-
+        print(queryset)
         return queryset
 
     def get_permissions(self):
