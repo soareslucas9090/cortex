@@ -122,7 +122,7 @@ class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [
-        IsAuthenticated,
+        AllowAny,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
@@ -132,7 +132,7 @@ class UserViewSet(ModelViewSet):
         nome = self.request.query_params.get("nome", None)
 
         if nome:
-            queryset = queryset.filter(nome=nome)
+            queryset = queryset.filter(nome__iexact=nome.lower())
             return queryset
 
         cpf = self.request.query_params.get("cpf", None)
