@@ -50,7 +50,7 @@ class StatusReclamacaoViewSet(ModelViewSet):
                 isativo = True
                 return queryset.filter(isativo=isativo)
 
-        return queryset.filter(isativo=isativo)
+        return queryset.filter(isativo=True)
 
     def get_permissions(self):
         if self.request.method in ["POST", "PATCH", "DELETE"]:
@@ -97,7 +97,7 @@ class TipoReclamacaoViewSet(ModelViewSet):
 
             elif isativo.lower() == "true":
                 isativo = True
-                return queryset.filter(isativo=isativo)
+                return queryset.filter(isativo=True)
         return queryset
 
     def get_permissions(self):
