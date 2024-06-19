@@ -6,6 +6,8 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
+from gerUsuarios.models import User
+
 from .models import *
 from .permissions import *
 from .serializers import *
@@ -168,6 +170,13 @@ class ReclamacaoViewSet(ModelViewSet):
     @extend_schema(
         parameters=[
             OpenApiParameter(
+                name="usuario",
+                type=OpenApiTypes.STR,
+                description="Filtra os resultados pelo usuario",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
                 name="data",
                 type=OpenApiTypes.STR,
                 description="Filtra os resultados pela data",
@@ -222,27 +231,32 @@ class ReclamacaoViewSet(ModelViewSet):
             queryset.filter(data_reclamacao=data_formatada)
 
         status_reclamacao_id = self.request.query_params.get("status_reclamacao_id")
-        status_reclamacao = None
         if status_reclamacao_id:
             status_reclamacao = StatusReclamacao.objects.get(pk=status_reclamacao_id)
-        if status_reclamacao:
-            queryset = queryset.filter(status_reclamacao=status_reclamacao)
+
+            if status_reclamacao:
+                queryset = queryset.filter(status_reclamacao=status_reclamacao)
+
+        usuario_id = self.request.query_params.get("usuario")
+        if usuario_id:
+            usuario = User.objects.get(pk=usuario_id)
+
+            if usuario:
+                queryset = queryset.filter(usuario=usuario)
 
         tipo_reclamacao_id = self.request.query_params.get("tipo_reclamacao_id")
-        tipo_reclamacao = None
         if tipo_reclamacao_id:
             tipo_reclamacao = TipoReclamacao.objects.get(pk=tipo_reclamacao_id)
 
-        if tipo_reclamacao:
-            queryset = queryset.filter(tipo_reclamacao=tipo_reclamacao)
+            if tipo_reclamacao:
+                queryset = queryset.filter(tipo_reclamacao=tipo_reclamacao)
 
         bloco_id = self.request.query_params.get("bloco_id")
-        bloco = None
         if bloco_id:
             bloco = TipoReclamacao.objects.get(pk=bloco_id)
 
-        if bloco:
-            queryset = queryset.filter(bloco=bloco)
+            if bloco:
+                queryset = queryset.filter(bloco=bloco)
 
         lida = self.request.query_params.get("lida", None)
         if lida:
