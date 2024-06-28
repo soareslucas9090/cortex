@@ -2,6 +2,7 @@ from datetime import date, datetime, timedelta
 
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
 from rest_framework import status
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.pagination import PageNumberPagination
@@ -116,6 +117,34 @@ class RotaViewSet(ModelViewSet):
         IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="status",
+                type=OpenApiTypes.STR,
+                description="Filtra as rotas pelo status",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
+                name="data",
+                type=OpenApiTypes.STR,
+                description="Filtra as rotas pela data",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
+                name="data_valida",
+                type=OpenApiTypes.STR,
+                description="Filtra as rotas pela data e por ainda estar válida para reserva",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = super().get_queryset()
