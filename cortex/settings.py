@@ -95,6 +95,7 @@ INSTALLED_APPS = [
     "gerUsuarios",
     "soticon",
     "ouvidoria",
+    "watt",
 ]
 
 MIDDLEWARE = [

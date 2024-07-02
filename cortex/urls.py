@@ -36,6 +36,7 @@ urlpatterns = [
     path("api/gerusuarios/v1/", include("gerUsuarios.urls")),
     path("api/soticon/v1/", include("soticon.urls")),
     path("api/ouvidoria/v1/", include("ouvidoria.urls")),
+    path("api/watt/v1/", include("watt.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "api/schema/swagger/",
