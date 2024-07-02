@@ -6,7 +6,7 @@ from .models import *
 from .serializers import *
 
 
-class StatusReclamacaoViewSet(ModelViewSet):
+class LeituraViewSet(ModelViewSet):
     queryset = Leitura.objects.all()
     serializer_class = LeituraSerializer
     permission_classes = [
