@@ -379,38 +379,36 @@ class FinalizarRota(ModelViewSet):
     ]
     http_method_names = ["put"]
 
-    def get_object(self, request):
-        if "rota" in request.data:
+    def get_object(self, request, **kwargs):
+        if "pk" in kwargs:
             try:
-                rota_id = request.data.get("rota")
-
+                rota_id = kwargs["pk"]
                 try:
-
                     rota_soticon = Rota.objects.get(pk=rota_id)
-
-                    rota = Rota.objects.filter(pk=rota_id)
-                    return rota
+                    return rota_soticon
 
                 except Rota.DoesNotExist:
-                    return Response("Rota não localizada!", status=404)
+                    return None
 
             except Exception as e:
                 print(e)
-                return Response("Erro ao realizar consulta de dados", status=500)
+                return Response(
+                    {"result": "Erro ao realizar consulta de dados"}, status=500
+                )
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
-        instance = self.get_object(request)
+        instance = self.get_object(request, **kwargs)
         if instance is None:
-            return Response("Rota não localizada", status=404)
+            return Response({"result": "Rota não localizada"}, status=404)
 
         dados = request.data
 
-        if dados["status"] == "sucesso":
-            dict_dados = {"status": "executada"}
-            instance.update(status=dict_dados["status"])
+        if dados["status"].lower() == "executada":
+            instance.status = "executada"
+            instance.save()
 
         else:
             if dados["obs"]:
@@ -418,10 +416,8 @@ class FinalizarRota(ModelViewSet):
             else:
                 obs = ""
 
-            dict_dados = {"status": "cancelada", "obs": obs}
+            instance.status = "cancelada"
+            instance.obs = obs
+            instance.save()
 
-            instance.update(status=dict_dados["status"], obs=dict_dados["obs"])
-
-        return Response(
-            {"Rota finalizada": request.data.get("rota")}, status=status.HTTP_200_OK
-        )
+        return Response({"result": "Rota finalizada"}, status=status.HTTP_200_OK)
