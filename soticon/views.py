@@ -190,6 +190,36 @@ class RotaViewSet(ModelViewSet):
 
         return queryset
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+
+        serializer.data["tickets"] = []
+
+        tickets = Tickets.objects.filter(rota=instance, reservado=True)
+
+        if tickets:
+            tickets_reservados = []
+
+            for ticket in tickets:
+
+                ticket_data = {
+                    "user": [
+                        {
+                            "id": ticket.user_soticon.id,
+                            "nome": ticket.user_soticon.usuario.nome,
+                        }
+                    ],
+                    "usado": ticket.usado,
+                    "num_ticket": ticket.posicao_fila.num_ticket,
+                }
+
+                tickets_reservados.append(ticket_data)
+
+            serializer.data["tickets"] = tickets_reservados
+
+        return Response(serializer.data)
+
 
 class TicketsViewSet(ModelViewSet):
     queryset = Tickets.objects.select_related("user_soticon__usuario").all()
