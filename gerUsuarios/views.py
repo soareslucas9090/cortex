@@ -1,6 +1,8 @@
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import get_object_or_404
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -12,6 +14,7 @@ from .permissions import *
 from .serializers import *
 
 
+@extend_schema(tags=["GerenciamentoDeUsuários.Tipos"])
 class TipoViewSet(ModelViewSet):
     queryset = Tipo.objects.all()
     serializer_class = TipoSerializer
@@ -28,9 +31,21 @@ class TipoViewSet(ModelViewSet):
         if tipo:
             queryset = queryset.filter(nome=tipo)
 
-            return queryset
-
         return queryset
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="tipo",
+                type=OpenApiTypes.STR,
+                description="Filtrar pelo nome do tipo",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def get_permissions(self):
         if self.request.method in ["POST", "PATCH", "DELETE"]:
@@ -39,6 +54,7 @@ class TipoViewSet(ModelViewSet):
         return super().get_permissions()
 
 
+@extend_schema(tags=["GerenciamentoDeUsuários.Enderecos"])
 class EnderecoViewSet(ModelViewSet):
     queryset = Endereco.objects.all()
     serializer_class = EnderecoSerializer
@@ -54,6 +70,7 @@ class EnderecoViewSet(ModelViewSet):
         return super().get_permissions()
 
 
+@extend_schema(tags=["GerenciamentoDeUsuários.Contatos"])
 class ContatoViewSet(ModelViewSet):
     queryset = Contato.objects.all()
     serializer_class = ContatoSerializer
@@ -69,15 +86,34 @@ class ContatoViewSet(ModelViewSet):
 
         if email:
             queryset = queryset.filter(email=email)
-            return queryset
 
         tel = self.request.query_params.get("tel", None)
 
         if tel and tel.isnumeric():
             queryset = queryset.filter(tel=tel)
-            return queryset
 
         return queryset
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="email",
+                type=OpenApiTypes.STR,
+                description="Filtrar pelo email do contato",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
+                name="tel",
+                type=OpenApiTypes.STR,
+                description="Filtrar pelo telefone do contato",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def get_permissions(self):
         if self.request.method in ["PATCH", "DELETE"]:
@@ -86,6 +122,7 @@ class ContatoViewSet(ModelViewSet):
         return super().get_permissions()
 
 
+@extend_schema(tags=["GerenciamentoDeUsuários.Empresas"])
 class EmpresaViewSet(ModelViewSet):
     queryset = Empresa.objects.all()
     serializer_class = EmpresaSerializer
@@ -101,15 +138,34 @@ class EmpresaViewSet(ModelViewSet):
 
         if nome:
             queryset = queryset.filter(nome=nome)
-            return queryset
 
         cnpj = self.request.query_params.get("cnpj", None)
 
         if cnpj and cnpj.isnumeric():
             queryset = queryset.filter(cnpj=cnpj)
-            return queryset
 
         return queryset
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="nome",
+                type=OpenApiTypes.STR,
+                description="Filtrar pelo nome da empresa",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
+                name="cnpj",
+                type=OpenApiTypes.STR,
+                description="Filtrar pelo CNPJ da empresa",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def get_permissions(self):
         if self.request.method in ["PATCH", "DELETE"]:
@@ -118,6 +174,7 @@ class EmpresaViewSet(ModelViewSet):
         return super().get_permissions()
 
 
+@extend_schema(tags=["GerenciamentoDeUsuários.Usuários"])
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -133,13 +190,11 @@ class UserViewSet(ModelViewSet):
 
         if nome:
             queryset = queryset.filter(nome__iexact=nome.lower())
-            return queryset
 
         cpf = self.request.query_params.get("cpf", None)
 
         if cpf and cpf.isnumeric():
             queryset = queryset.filter(cpf=cpf)
-            return queryset
 
         return queryset
 
@@ -169,6 +224,27 @@ class UserViewSet(ModelViewSet):
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
         )
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="nome",
+                type=OpenApiTypes.STR,
+                description="Filtrar pelo nome do usuario",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
+                name="cpf",
+                type=OpenApiTypes.STR,
+                description="Filtrar pelo CPF do usuário",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
     def get_permissions(self):
         if self.request.method in ["PATCH", "DELETE"]:
             return [IsAdminOrTI()]
@@ -176,6 +252,7 @@ class UserViewSet(ModelViewSet):
         return super().get_permissions()
 
 
+@extend_schema(tags=["GerenciamentoDeUsuários.Setores"])
 class SetorViewSet(ModelViewSet):
     queryset = Setor.objects.all()
     serializer_class = SetorSerializer
@@ -191,9 +268,22 @@ class SetorViewSet(ModelViewSet):
 
         if nome:
             queryset = queryset.filter(nome=nome)
-            return queryset
-        print(queryset)
+
         return queryset
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="nome",
+                type=OpenApiTypes.STR,
+                description="Filtrar pelo nome do setor",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def get_permissions(self):
         if self.request.method in ["PATCH", "DELETE"]:
@@ -217,17 +307,6 @@ class SetorUserViewSet(ModelViewSet):
         return super().get_permissions()
 
 
-"""
-class AlteracaoUsuarioViewSet(ModelViewSet):
-    queryset = ALTERACAO_USUARIO.objects.all()
-    serializer_class = AlteracaoUsuarioSerializer
-    permission_classes = [
-        IsAuthenticated,
-    ]
-    http_method_names = ["get", "head", "patch", "delete", "post"]
-"""
-
-
 class TipoMatriculaViewSet(ModelViewSet):
     queryset = Tipo_Matricula.objects.all()
     serializer_class = Tipo_MatriculaSerializer
@@ -243,7 +322,6 @@ class TipoMatriculaViewSet(ModelViewSet):
 
         if descricao:
             queryset = queryset.filter(descricao=descricao)
-            return queryset
 
         return queryset
 
@@ -254,6 +332,7 @@ class TipoMatriculaViewSet(ModelViewSet):
         return super().get_permissions()
 
 
+@extend_schema(tags=["GerenciamentoDeUsuários.Matriculas"])
 class MatriculaViewSet(ModelViewSet):
     queryset = Matricula.objects.all()
     serializer_class = MatriculaSerializer
@@ -284,3 +363,24 @@ class MatriculaViewSet(ModelViewSet):
             return queryset
 
         return queryset
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="user",
+                type=OpenApiTypes.INT,
+                description="Filtrar pelo id do usuario",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
+                name="user",
+                type=OpenApiTypes.INT,
+                description="Filtrar a matricula do usuario",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)

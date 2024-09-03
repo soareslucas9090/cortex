@@ -99,6 +99,7 @@ celerybeat-schedule.*
 cortexVenv/
 .venv
 .env
+deployenv
 venv
 /venv
 .env 
