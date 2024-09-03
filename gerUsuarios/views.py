@@ -228,32 +228,6 @@ class AlteracaoUsuarioViewSet(ModelViewSet):
 """
 
 
-class TipoMatriculaViewSet(ModelViewSet):
-    queryset = Tipo_Matricula.objects.all()
-    serializer_class = Tipo_MatriculaSerializer
-    permission_classes = [
-        IsAuthenticated,
-    ]
-    http_method_names = ["get", "head", "patch", "delete", "post"]
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        descricao = self.request.query_params.get("descricao", None)
-
-        if descricao:
-            queryset = queryset.filter(descricao=descricao)
-            return queryset
-
-        return queryset
-
-    def get_permissions(self):
-        if self.request.method in ["PATCH", "DELETE"]:
-            return [IsAdminOrTI()]
-
-        return super().get_permissions()
-
-
 class MatriculaViewSet(ModelViewSet):
     queryset = Matricula.objects.all()
     serializer_class = MatriculaSerializer

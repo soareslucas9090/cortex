@@ -67,7 +67,7 @@ class Contato(Base):
 
 class Empresa(Base):
     contato = models.ForeignKey(
-        Contato, related_name="empresa_contato", on_delete=models.RESTRICT, null=False
+        Contato, related_name="empresa_contato", on_delete=models.RESTRICT, null=True
     )
     nome = models.CharField(max_length=30, null=False)
     cnpj = models.CharField(max_length=14, unique=True, null=False)
@@ -223,40 +223,9 @@ class Setor_User(Base):
         return str
 
 
-"""
-class Alteracao_User(models.Model):
-    user = models.ForeignKey(
-        User, related_name="alteracao_user_user", on_delete=models.RESTRICT, null=False
-    )
-    analisado = models.BooleanField(default=False, null=False)
-    aprovado = models.BooleanField(default=False, null=False)
-    antigo_contato = models.IntegerField(null=True)
-    novo_contato = models.IntegerField(null=True)
-    user_analista = models.IntegerField(null=True)
-"""
-
-
-class Tipo_Matricula(Base):
-    descricao = models.CharField(max_length=60, null=False)
-
-    def save(self, *args, **kwargs):
-        self.descricao = self.descricao.lower()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        str = f"{self.descricao}"
-        return str
-
-
 class Matricula(Base):
     user = models.ForeignKey(
         User, related_name="matricula_user", on_delete=models.RESTRICT, null=False
-    )
-    tipo_matricula = models.ForeignKey(
-        Tipo_Matricula,
-        related_name="tipo_matricula",
-        on_delete=models.RESTRICT,
-        null=False,
     )
     matricula = models.CharField(max_length=19, null=False, unique=True)
     validade = models.DateField(null=True)
