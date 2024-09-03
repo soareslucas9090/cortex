@@ -21,7 +21,7 @@ class TipoViewSet(ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
-    http_method_names = ["get", "head", "patch", "delete", "post"]
+    http_method_names = ["get", "head", "patch", "post"]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -48,7 +48,7 @@ class TipoViewSet(ModelViewSet):
         return super().list(request, *args, **kwargs)
 
     def get_permissions(self):
-        if self.request.method in ["POST", "PATCH", "DELETE"]:
+        if self.request.method in ["POST", "PATCH"]:
             return [IsAdminOrTI()]
 
         return super().get_permissions()
@@ -62,6 +62,14 @@ class EnderecoViewSet(ModelViewSet):
         IsAuthenticated,
     ]
     http_method_names = ["get", "head", "patch", "delete", "post"]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        if not IsAdminOrTI().has_permission(self.request, self):
+            queryset = queryset.filter(id=self.request.user.contato.endereco.id)
+
+        return queryset
 
     def get_permissions(self):
         if self.request.method in ["PATCH", "DELETE"]:
@@ -81,6 +89,9 @@ class ContatoViewSet(ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+
+        if not IsAdminOrTI().has_permission(self.request, self):
+            return queryset.filter(id=self.request.user.contato.id)
 
         email = self.request.query_params.get("email", None)
 
@@ -134,6 +145,9 @@ class EmpresaViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
 
+        if not IsAdminOrTI().has_permission(self.request, self):
+            return queryset.filter(id=self.request.user.empresa.id)
+
         nome = self.request.query_params.get("nome", None)
 
         if nome:
@@ -186,10 +200,13 @@ class UserViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
 
+        if not IsAdminOrTI().has_permission(self.request, self):
+            return queryset.filter(id=self.request.user.id)
+
         nome = self.request.query_params.get("nome", None)
 
         if nome:
-            queryset = queryset.filter(nome__iexact=nome.lower())
+            queryset = queryset.filter(nome__icontains=nome.lower())
 
         cpf = self.request.query_params.get("cpf", None)
 
@@ -246,7 +263,7 @@ class UserViewSet(ModelViewSet):
         return super().list(request, *args, **kwargs)
 
     def get_permissions(self):
-        if self.request.method in ["PATCH", "DELETE"]:
+        if self.request.method in ["PATCH", "DELETE", "POST"]:
             return [IsAdminOrTI()]
 
         return super().get_permissions()
@@ -259,7 +276,7 @@ class SetorViewSet(ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
-    http_method_names = ["get", "head", "patch", "delete", "post"]
+    http_method_names = ["get", "head", "patch", "post"]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -319,6 +336,9 @@ class MatriculaViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
 
+        if not IsAdminOrTI().has_permission(self.request, self):
+            return queryset.filter(user=self.request.user)
+
         user = self.request.query_params.get("user", None)
 
         if user and user.isnumeric():
@@ -359,3 +379,9 @@ class MatriculaViewSet(ModelViewSet):
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
+
+    def get_permissions(self):
+        if self.request.method in ["PATCH", "DELETE", "POST"]:
+            return [IsAdminOrTI()]
+
+        return super().get_permissions()
