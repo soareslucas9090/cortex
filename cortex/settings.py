@@ -1,27 +1,15 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 from .rest_framework_settings import *
 from .spectacular_settings import *
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get("secretKeyDjango")
 
-if SECRET_KEY:
-    DEBUG = os.environ.get("debugMode")
-    ALLOWED_HOSTS = [os.environ.get("allowedHosts")]
-    DATABASES = {
-        "default": {
-            "ENGINE": os.environ.get("bdEngine"),
-            "NAME": os.environ.get("bdName"),
-            "USER": os.environ.get("bdUser"),
-            "PASSWORD": os.environ.get("bdPass"),
-            "HOST": os.environ.get("bdHost"),
-            "PORT": os.environ.get("bdPort"),
-        }
-    }
-else:
+try:
     from .env import *
 
     SECRET_KEY = secretKeyDjango
@@ -37,6 +25,22 @@ else:
             "PORT": bdPort,
         }
     }
+except:
+    load_dotenv()
+    SECRET_KEY = os.environ.get("secretKeyDjango")
+    DEBUG = os.environ.get("debugMode")
+    ALLOWED_HOSTS = [os.environ.get("allowedHosts")]
+    DATABASES = {
+        "default": {
+            "ENGINE": os.environ.get("bdEngine"),
+            "NAME": os.environ.get("bdName"),
+            "USER": os.environ.get("bdUser"),
+            "PASSWORD": os.environ.get("bdPass"),
+            "HOST": os.environ.get("bdHost"),
+            "PORT": os.environ.get("bdPort"),
+        }
+    }
+
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:15500",
     "http://127.0.0.1:15500",
