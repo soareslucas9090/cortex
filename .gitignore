@@ -43,6 +43,7 @@ out/
 
 # JIRA plugin
 atlassian-ide-plugin.xml
+/static
 
 # Python # 
 *.py[cod] 
