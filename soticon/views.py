@@ -2,7 +2,13 @@ from datetime import date, datetime, timedelta
 
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import OpenApiParameter, OpenApiTypes, extend_schema
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiParameter,
+    OpenApiResponse,
+    OpenApiTypes,
+    extend_schema,
+)
 from rest_framework import status
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.pagination import PageNumberPagination
@@ -14,6 +20,7 @@ from .models import *
 from .serializers import *
 
 
+@extend_schema(tags=["Soticon.UsersSoticon"])
 class UserSoticonViewSet(ModelViewSet):
     queryset = UserSoticon.objects.all()
     serializer_class = UserSoticonSerializer
@@ -72,6 +79,7 @@ class UserSoticonViewSet(ModelViewSet):
             return Response(serializer.data)
 
 
+@extend_schema(tags=["Soticon.Strikes"])
 class StrikeViewSet(ModelViewSet):
     queryset = Strike.objects.all()
     serializer_class = StrikeSerializer
@@ -91,7 +99,22 @@ class StrikeViewSet(ModelViewSet):
 
         return queryset
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="nome",
+                type=OpenApiTypes.STR,
+                description="Filtra os strikes de um usuario pelo nome dele",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
+
+@extend_schema(tags=["Soticon.Justificativas"])
 class JustificativaViewSet(ModelViewSet):
     queryset = Justificativa.objects.all()
     serializer_class = JustificativaSerializer
@@ -101,6 +124,7 @@ class JustificativaViewSet(ModelViewSet):
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
 
+@extend_schema(tags=["Soticon.PosicaoFila"])
 class PosicaoFilaViewSet(ModelViewSet):
     queryset = PosicaoFila.objects.all()
     serializer_class = PosicaoFilaSerializer
@@ -110,6 +134,7 @@ class PosicaoFilaViewSet(ModelViewSet):
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
 
+@extend_schema(tags=["Soticon.Rotas"])
 class RotaViewSet(ModelViewSet):
     queryset = Rota.objects.all()
     serializer_class = RotaSerializer
@@ -149,6 +174,7 @@ class RotaViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
 
+        ######## Filtro de data geral ########
         status = self.request.query_params.get("status", None)
 
         if status:
@@ -190,6 +216,9 @@ class RotaViewSet(ModelViewSet):
 
         return queryset
 
+    @extend_schema(
+        description="Retorna dados dos tickets reservados para aquela rota também.",
+    )
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
@@ -221,6 +250,7 @@ class RotaViewSet(ModelViewSet):
         return Response(serializer.data)
 
 
+@extend_schema(tags=["Soticon.Tickets"])
 class TicketsViewSet(ModelViewSet):
     queryset = Tickets.objects.select_related("user_soticon__usuario").all()
     serializer_class = TicketsSerializer
@@ -257,6 +287,35 @@ class TicketsViewSet(ModelViewSet):
 
         return queryset
 
+    @extend_schema(
+        description="Os tickets pesquisados por rota_valida ou usuario vêm com mais detalhes",
+        parameters=[
+            OpenApiParameter(
+                name="rota",
+                type=OpenApiTypes.INT,
+                description="Filtras os tickets de determinada rota",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
+                name="rota_valida",
+                type=OpenApiTypes.INT,
+                description="Filtra os tickets efetivamente reservados para uma determinada rota",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
+                name="usuario",
+                type=OpenApiTypes.INT,
+                description="Filtra todos os tickets de determinado usuário que não foram usados para a data de hoje",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
     def get_serializer_class(self):
         if self.request.query_params.get(
             "rota_valida", None
@@ -266,6 +325,7 @@ class TicketsViewSet(ModelViewSet):
         return self.serializer_class
 
 
+@extend_schema(tags=["Soticon.Reservar Tickets"])
 class ReservarTickets(GenericViewSet, CreateModelMixin):
     queryset = Tickets.objects.all()
     serializer_class = ReservarTicketSerializer
@@ -274,6 +334,18 @@ class ReservarTickets(GenericViewSet, CreateModelMixin):
     ]
     http_method_names = ["post"]
 
+    @extend_schema(
+        responses={
+            status.HTTP_201_CREATED: OpenApiResponse(description="Ticket reservado"),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Rota não válida"),
+            status.HTTP_406_NOT_ACCEPTABLE: OpenApiResponse(
+                description="Rota não disponível"
+            ),
+            status.HTTP_500_INTERNAL_SERVER_ERROR: OpenApiResponse(
+                description="Internal Error"
+            ),
+        }
+    )
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -353,6 +425,7 @@ class ReservarTickets(GenericViewSet, CreateModelMixin):
             return Response(erro, status=status.HTTP_404_NOT_FOUND)
 
 
+@extend_schema(tags=["Soticon.Verificar Tickets"])
 class VerificarTickets(ModelViewSet):
     queryset = Tickets.objects.all()
     serializer_class = TicketsSerializer
@@ -401,6 +474,7 @@ class VerificarTickets(ModelViewSet):
         return Response(serializer.data)
 
 
+@extend_schema(tags=["Soticon.Finalizar Rota"])
 class FinalizarRota(ModelViewSet):
     queryset = Rota.objects.all()
     serializer_class = FinalizarRotaSerializer
