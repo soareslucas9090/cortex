@@ -217,21 +217,12 @@ class Alteracao_UserSerializer(serializers.ModelSerializer):
 """
 
 
-class Tipo_MatriculaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tipo_Matricula
-        fields = "__all__"
-
-
 class MatriculaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Matricula
         fields = "__all__"
 
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    tipo_matricula = serializers.PrimaryKeyRelatedField(
-        queryset=Tipo_Matricula.objects.all()
-    )
 
 
 class Matricula2UserSerializer(serializers.ModelSerializer):
@@ -240,10 +231,5 @@ class Matricula2UserSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "matricula",
-            "tipo_matricula",
             "is_ativo",
         ]
-
-    tipo_matricula = serializers.PrimaryKeyRelatedField(
-        queryset=Tipo_Matricula.objects.all()
-    )

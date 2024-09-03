@@ -307,31 +307,6 @@ class SetorUserViewSet(ModelViewSet):
         return super().get_permissions()
 
 
-class TipoMatriculaViewSet(ModelViewSet):
-    queryset = Tipo_Matricula.objects.all()
-    serializer_class = Tipo_MatriculaSerializer
-    permission_classes = [
-        IsAuthenticated,
-    ]
-    http_method_names = ["get", "head", "patch", "delete", "post"]
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        descricao = self.request.query_params.get("descricao", None)
-
-        if descricao:
-            queryset = queryset.filter(descricao=descricao)
-
-        return queryset
-
-    def get_permissions(self):
-        if self.request.method in ["PATCH", "DELETE"]:
-            return [IsAdminOrTI()]
-
-        return super().get_permissions()
-
-
 @extend_schema(tags=["GerenciamentoDeUsuários.Matriculas"])
 class MatriculaViewSet(ModelViewSet):
     queryset = Matricula.objects.all()

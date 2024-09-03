@@ -10,8 +10,6 @@ blog_router.register("contatos", ContatoViewSet)
 blog_router.register("empresas", EmpresaViewSet)
 blog_router.register("users", UserViewSet)
 blog_router.register("setores", SetorViewSet)
-blog_router.register("setorusers", SetorUserViewSet)
-blog_router.register("tiposmatricula", TipoMatriculaViewSet)
 blog_router.register("matriculas", MatriculaViewSet)
 
 

@@ -236,27 +236,9 @@ class Alteracao_User(models.Model):
 """
 
 
-class Tipo_Matricula(Base):
-    descricao = models.CharField(max_length=60, null=False)
-
-    def save(self, *args, **kwargs):
-        self.descricao = self.descricao.lower()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        str = f"{self.descricao}"
-        return str
-
-
 class Matricula(Base):
     user = models.ForeignKey(
         User, related_name="matricula_user", on_delete=models.RESTRICT, null=False
-    )
-    tipo_matricula = models.ForeignKey(
-        Tipo_Matricula,
-        related_name="tipo_matricula",
-        on_delete=models.RESTRICT,
-        null=False,
     )
     matricula = models.CharField(max_length=19, null=False, unique=True)
     validade = models.DateField(null=True)

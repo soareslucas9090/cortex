@@ -31,10 +31,6 @@ class SetorUserAdmin(admin.ModelAdmin):
     pass
 
 
-class TipoMatriculaAdmin(admin.ModelAdmin):
-    pass
-
-
 class MatriculaAdmin(admin.ModelAdmin):
     pass
 
@@ -46,5 +42,4 @@ admin.site.register(Contato, ContatoAdmin)
 admin.site.register(Empresa, EmpresaAdmin)
 admin.site.register(Setor, SetorAdmin)
 admin.site.register(Setor_User, SetorUserAdmin)
-admin.site.register(Tipo_Matricula, TipoMatriculaAdmin)
 admin.site.register(Matricula, MatriculaAdmin)

@@ -22,17 +22,14 @@ from drf_spectacular.views import (
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenVerifyView,
-)
+
+from .view_jwt import TokenObtainPairViewDOC, TokenRefreshViewDOC, TokenVerifyViewDOC
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path("api/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
+    path("api/token/", TokenObtainPairViewDOC.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshViewDOC.as_view(), name="token_refresh"),
+    path("api/token/verify/", TokenVerifyViewDOC.as_view(), name="token_verify"),
     path("api/gerusuarios/v1/", include("gerUsuarios.urls")),
     path("api/soticon/v1/", include("soticon.urls")),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
