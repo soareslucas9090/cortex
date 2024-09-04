@@ -5,8 +5,6 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     # Autenticação por seção está comentada pois foi implementada a por token, mas pode ter as duas
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        #'rest_framework.authentication.SessionAuthentication',
-        "rest_framework.authentication.TokenAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     # Somente é autorizado o acesso, seja get, seja update/delete/post se autenticado
@@ -37,8 +35,8 @@ else:
     signing_key = secretKeyJWT
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
-    "REFRESH_TOKEN_LIFETIME": timedelta(minutes=35),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(minutes=40),
     "BLACKLIST_AFTER_ROTATION": False,
     "SIGNING_KEY": signing_key,
     "AUTH_HEADER_TYPES": ("Bearer",),

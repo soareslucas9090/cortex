@@ -25,6 +25,8 @@ try:
             "PORT": bdPort,
         }
     }
+    CSRF_TRUSTED_ORIGINS = csrfTrustedOrigins
+    INTERNAL_IPS = internalIPs
 except:
     load_dotenv()
     SECRET_KEY = os.environ.get("secretKeyDjango")
@@ -40,28 +42,11 @@ except:
             "PORT": os.environ.get("bdPort"),
         }
     }
+    CSRF_TRUSTED_ORIGINS = os.environ.get("csrfTrustedOrigins", "").split(",")
+    INTERNAL_IPS = os.environ.get("internalIPs", "").split(",")
 
-CORS_ORIGIN_WHITELIST = [
-    "http://localhost:15500",
-    "http://127.0.0.1:15500",
-    "http://localhost:5500",
-    "http://127.0.0.1:5500",
-    "https://cortexfront.web.app",
-    "https://web-5gnex1an3lly.up-us-nyc1-k8s-1.apps.run-on-seenode.com",
-    "https://cloud.seenode.com",
-]
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:15500",
-    "http://127.0.0.1:15500",
-    "http://localhost:5500",
-    "http://127.0.0.1:5500",
-    "https://cortexfront.web.app",
-    "https://web-5gnex1an3lly.up-us-nyc1-k8s-1.apps.run-on-seenode.com",
-    "https://cloud.seenode.com",
-]
-
-CORS_ALLOW_ALL_ORIGINS: False
+CORS_ALLOW_ALL_ORIGINS: True
 
 CORS_ALLOW_METHODS = ["*"]
 
@@ -120,11 +105,6 @@ DEBUG_TOOLBAR_PANELS = [
 ]
 
 ROOT_URLCONF = "cortex.urls"
-
-INTERNAL_IPS = [
-    "127.0.0.1",
-    "https://web-5gnex1an3lly.up-us-nyc1-k8s-1.apps.run-on-seenode.com/",
-]
 
 
 TEMPLATES = [
