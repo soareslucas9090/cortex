@@ -72,6 +72,8 @@ Colocar o arquivo `.env` na raiz do projeto.
 
 Faça a criação do banco de dados com o comando `python manage.py makemigrations` e depois `python manage.py migrate`.
 
+Depois de criar o banco, acesse ele por algum cliente, como o DBeaver, e crie a função e tarefa SQL no arquivo `Schedule atualizar rotas.txt` localizado na pasta `/forBD/`. Este código é necessário para o fechamento automático de rotas.
+
 Crie um super usuário com o comando `python manage.py createsuperuser` e forneça os dados que vão ser pedidos.
 
 Com tudo configurado, o servidor para rodar o sistema em qualquer computador com Windows 8+ ou Server 2012+ é o "Waitress", e o comando para iniciar é:
