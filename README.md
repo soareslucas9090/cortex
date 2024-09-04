@@ -111,6 +111,8 @@ Abaixo está o DER do SOTICON:
 - **soticon_tickets** armazena os dados da reserva dos alunos ao ônibus. Uma vez criada não é apagada, e altera somente o id do usuário que fez a reserva, mas evitar escritas desnecessárias no banco.
 - **soticon_posicaofila** armazena as posições padrões da fila para o ônibus.
 - **soticon_rota** contém os dados das rotas de ônibus cadastradas no sistema.
+- **soticon_regras** conterá as regras de negócio da aplicação, como o número de pessoas na fila "primária" do ônibus (quantas pessoas cabem, no caso) e outros dados em geral.
+
 
 ## Autenticação
 
