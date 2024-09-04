@@ -82,7 +82,7 @@ Com tudo configurado, o servidor para rodar o sistema em qualquer computador com
 O servidor para rodar o sistema em um computador Linux é o "Gunicorn", e o comando é:
 `gunicorn cortex.wsgi --workers 2 --bind :8000 --access-logfile -`
 
-O serviço rodará no IP local, sendo acessível pela porta 8000 (é necessário a liberação da porta no Firewall do sistema e da rede. A porta também pode ser mudada por qualquer uma disponível. Exemplo: Servidor com IP `10.7.1.10`, o serviço ficará disponível em `http://10.7.1.10:8000`. Para rodar o sistema em uma porta HTTPS é necessário configurações adicionais no servidor.
+O serviço rodará no IP local, sendo acessível pela porta 8000 (é necessário a liberação da porta no Firewall do sistema e da rede. A porta também pode ser mudada por qualquer uma disponível. Exemplo: Servidor com IP `10.7.1.10`, o serviço ficará disponível em `http://10.7.1.10:8000`. Para rodar o sistema em HTTPS é necessário configurações adicionais no servidor.
 
 ## Lógica
 
