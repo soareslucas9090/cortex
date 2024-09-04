@@ -11,6 +11,8 @@ class GerusuariosConfig(AppConfig):
         from .models import Empresa, Setor, Tipo
 
         post_migrate.connect(create_default_tipos, sender=self)
+        post_migrate.connect(create_default_setores, sender=self)
+        post_migrate.connect(create_default_empresa, sender=self)
 
 
 def create_default_tipos(sender, **kwargs):
@@ -31,8 +33,9 @@ def create_default_tipos(sender, **kwargs):
 
     for name_tipo in default_tipos:
         try:
-            Tipo.objects.get_or_create(name=name_tipo)
+            Tipo.objects.get_or_create(nome=name_tipo.lower())
         except OperationalError:
+            print("Não foi possível realizar migrate de dados de Tipos")
             pass
 
 
@@ -60,8 +63,9 @@ def create_default_setores(sender, **kwargs):
 
     for name_setor in default_setor:
         try:
-            Setor.objects.get_or_create(name=name_setor)
+            Setor.objects.get_or_create(nome=name_setor.lower())
         except OperationalError:
+            print("Não foi possível realizar migrate de dados de Setores")
             pass
 
 
@@ -70,7 +74,8 @@ def create_default_empresa(sender, **kwargs):
 
     try:
         Empresa.objects.get_or_create(
-            nome="IFPI - Campus Floriano", cnpj="10806496000491"
+            nome__iexact="IFPI - Campus Floriano", cnpj="10806496000491"
         )
     except OperationalError:
+        print("Não foi possível realizar migrate de dados de Empresas")
         pass

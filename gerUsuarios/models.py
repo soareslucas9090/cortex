@@ -69,7 +69,7 @@ class Empresa(Base):
     contato = models.ForeignKey(
         Contato, related_name="empresa_contato", on_delete=models.RESTRICT, null=False
     )
-    nome = models.CharField(max_length=30, null=False)
+    nome = models.CharField(max_length=30, null=False, unique=True)
     cnpj = models.CharField(max_length=14, unique=True, null=False)
 
     def __str__(self):
@@ -199,7 +199,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Setor(Base):
-    nome = models.CharField(max_length=50, null=False)
+    nome = models.CharField(max_length=50, null=False, unique=True)
 
     def save(self, *args, **kwargs):
         self.nome = self.nome.lower()
