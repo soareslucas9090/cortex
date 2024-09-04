@@ -70,6 +70,10 @@ internalIPs=127.0.0.1,localhost,http://127.0.0.1,https://127.0.0.1,http://localh
 ```
 Colocar o arquivo `.env` na raiz do projeto.
 
+Faça a criação do banco de dados com o comando `python manage.py makemigrations` e depois `python manage.py migrate`.
+
+Crie um super usuário com o comando `python manage.py createsuperuser` e forneça os dados que vão ser pedidos.
+
 Com tudo configurado, o servidor para rodar o sistema em qualquer computador com Windows 8+ ou Server 2012+ é o "Waitress", e o comando para iniciar é:
 `waitress-serve --port=8000 cortex.wsgi:application`
 
