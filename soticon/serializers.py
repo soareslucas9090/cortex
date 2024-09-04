@@ -13,7 +13,7 @@ class UserSoticonSerializer(serializers.ModelSerializer):
     nome = serializers.SerializerMethodField()
     usuario = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
-    def get_nome(self, obj):
+    def get_nome(self, obj) -> str:
         nome = User.objects.get(id=obj.usuario.id).nome
         return nome
 
@@ -28,7 +28,7 @@ class StrikeSerializer(serializers.ModelSerializer):
     )
     nome = serializers.SerializerMethodField()
 
-    def get_nome(self, obj):
+    def get_nome(self, obj) -> str:
         nome = User.objects.get(id=obj.usuario.id).nome
         return nome
 

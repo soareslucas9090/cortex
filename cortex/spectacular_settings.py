@@ -13,7 +13,7 @@ SPECTACULAR_SETTINGS = {
         {
             "name": "GerenciamentoDeUsuários.Tipos",
             "description": """Rotas relacionadas com os tipos de usuários.\n
-            Tipos padrões: "Admin", "TI", "Aluno", "Professor", "Diretor Geral", "Diretor de Ensino","Coordenador","Motorista","Tec. Administrativo","Terceirizado",""",
+    Tipos padrões: "Admin", "TI", "Aluno", "Professor", "Diretor Geral", "Diretor de Ensino","Coordenador","Motorista","Tec. Administrativo","Terceirizado".""",
         },
         {
             "name": "GerenciamentoDeUsuários.Enderecos",
@@ -34,10 +34,7 @@ SPECTACULAR_SETTINGS = {
         {
             "name": "GerenciamentoDeUsuários.Setores",
             "description": """Rotas relacionadas com os setores dos usuários.\n
-            Setores padrões: "Direcao Geral", "Direcao de Ensino", "Docente", "Coordenacao Informatica", "Coordenacao Eletromecanica","Coordenacao Edificacoes",
-            "Coordenacao Meio Ambiente","Coordenacao TADS","Coordenacao Biologia", "Coordenacao Matematica", "Contabilidade", "Saude",
-            "Multimeios", "CODIS", "Refeitorio", "Guarita",
-            """,
+    Setores padrões: "Direcao Geral", "Direcao de Ensino", "Docente", "Coordenacao Informatica", "Coordenacao Eletromecanica","Coordenacao Edificacoes","Coordenacao Meio Ambiente","Coordenacao TADS","Coordenacao Biologia", "Coordenacao Matematica", "Contabilidade", "Saude", "Multimeios", "CODIS", "Refeitorio", "Guarita".""",
         },
         {
             "name": "GerenciamentoDeUsuários.Matriculas",

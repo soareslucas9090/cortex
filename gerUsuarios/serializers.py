@@ -1,3 +1,4 @@
+from drf_spectacular.utils import OpenApiExample, OpenApiTypes, extend_schema_field
 from rest_framework import serializers
 
 from .models import *
@@ -49,6 +50,7 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "cpf",
             "setores",
+            "nome_setores",
             "tipo",
             "nome_tipo",
             "contato",
@@ -62,7 +64,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     password = serializers.CharField(write_only=True)
     setores = serializers.PrimaryKeyRelatedField(
-        queryset=Setor.objects.all(), many=True, allow_empty=False
+        queryset=Setor.objects.all(), many=True, allow_empty=False, write_only=True
     )
 
     tipo = serializers.PrimaryKeyRelatedField(
@@ -78,34 +80,50 @@ class UserSerializer(serializers.ModelSerializer):
     nome_tipo = serializers.SerializerMethodField(read_only=True)
     nome_contato = serializers.SerializerMethodField(read_only=True)
     nome_empresa = serializers.SerializerMethodField(read_only=True)
+    nome_setores = serializers.SerializerMethodField(read_only=True)
     matricula = serializers.SerializerMethodField()
 
-    def get_nome_tipo(self, obj):
+    def get_nome_tipo(self, obj) -> str:
         try:
             nome = Tipo.objects.get(id=obj.tipo.id).nome
             return nome
         except:
             return None
 
-    def get_nome_contato(self, obj):
+    def get_nome_contato(self, obj) -> str:
         try:
             tel = Contato.objects.get(id=obj.contato.id).tel
             return tel
         except:
             return None
 
-    def get_nome_empresa(self, obj):
+    def get_nome_empresa(self, obj) -> str:
         try:
             nome = Empresa.objects.get(id=obj.empresa.id).nome
             return nome
         except:
             return None
 
-    def get_matricula(self, obj):
+    @extend_schema_field(
+        {
+            "example": {"id": 0, "matricula": "example123", "is_ativo": True},
+        }
+    )
+    def get_matricula(self, obj) -> dict | None:
         try:
             matriculas = Matricula.objects.filter(user=obj)
             serializer = Matricula2UserSerializer(matriculas, many=True)
             return serializer.data
+        except:
+            return None
+
+    def get_nome_setores(self, obj) -> list[str]:
+        try:
+            setores = Setor_User.objects.filter(user=obj)
+            data = []
+            for setor in setores:
+                data.append(setor.setor.nome)
+            return data
         except:
             return None
 
@@ -120,7 +138,7 @@ class UserSerializer(serializers.ModelSerializer):
     def validate_cpf(self, value):
         cpf = value
 
-        if len(cpf) < 11:
+        if len(cpf) != 11:
             raise serializers.ValidationError("Must have at least 11 chars.")
 
         return cpf
