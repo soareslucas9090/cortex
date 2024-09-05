@@ -65,7 +65,7 @@ bdPass=Senha do Banco
 bdHost=Host do banco
 bdPort=Porta do banco
 allowedHosts=*
-csrfTrustedOrigins=IP do servidor que hosperdará o frontend da aplicação e permitirá acesso à API, caso seja mais de um, divida eles com virgulas sem espaço, como na variável abaixo
+csrfTrustedOriginsANDcorsOriginWhitelist=IP do servidor que hosperdará o frontend da aplicação e permitirá acesso à API, caso seja mais de um, divida eles com virgulas sem espaço, como na variável abaixo
 internalIPs=127.0.0.1,localhost,http://127.0.0.1,https://127.0.0.1,http://localhost,https://localhost
 ```
 Colocar o arquivo `.env` na raiz do projeto.
