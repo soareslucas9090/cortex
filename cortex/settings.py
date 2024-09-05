@@ -8,42 +8,27 @@ from .spectacular_settings import *
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-try:
-    from .env import *
-
-    SECRET_KEY = secretKeyDjango
-    DEBUG = debug
-    ALLOWED_HOSTS = allowedHosts
-    DATABASES = {
-        "default": {
-            "ENGINE": bdEngine,
-            "NAME": bdName,
-            "USER": bdUser,
-            "PASSWORD": bdPass,
-            "HOST": bdHost,
-            "PORT": bdPort,
-        }
+load_dotenv()
+SECRET_KEY = os.environ.get("secretKeyDjango")
+DEBUG = os.environ.get("debugMode")
+ALLOWED_HOSTS = [os.environ.get("allowedHosts")]
+DATABASES = {
+    "default": {
+        "ENGINE": os.environ.get("bdEngine"),
+        "NAME": os.environ.get("bdName"),
+        "USER": os.environ.get("bdUser"),
+        "PASSWORD": os.environ.get("bdPass"),
+        "HOST": os.environ.get("bdHost"),
+        "PORT": os.environ.get("bdPort"),
     }
-    CSRF_TRUSTED_ORIGINS = csrfTrustedOrigins
-    INTERNAL_IPS = internalIPs
-except:
-    load_dotenv()
-    SECRET_KEY = os.environ.get("secretKeyDjango")
-    DEBUG = os.environ.get("debugMode")
-    ALLOWED_HOSTS = [os.environ.get("allowedHosts")]
-    DATABASES = {
-        "default": {
-            "ENGINE": os.environ.get("bdEngine"),
-            "NAME": os.environ.get("bdName"),
-            "USER": os.environ.get("bdUser"),
-            "PASSWORD": os.environ.get("bdPass"),
-            "HOST": os.environ.get("bdHost"),
-            "PORT": os.environ.get("bdPort"),
-        }
-    }
-    CSRF_TRUSTED_ORIGINS = os.environ.get("csrfTrustedOrigins", "").split(",")
-    INTERNAL_IPS = os.environ.get("internalIPs", "").split(",")
+}
+CSRF_TRUSTED_ORIGINS = os.environ.get(
+    "csrfTrustedOriginsANDcorsOriginWhitelist", ""
+).split(",")
+INTERNAL_IPS = os.environ.get("internalIPs", "").split(",")
+CORS_ORIGIN_WHITELIST = os.environ.get(
+    "csrfTrustedOriginsANDcorsOriginWhitelist", ""
+).split(",")
 
 
 CORS_ALLOW_ALL_ORIGINS: True

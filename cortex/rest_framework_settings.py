@@ -1,6 +1,8 @@
 import os
 from datetime import timedelta
 
+from dotenv import load_dotenv
+
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     # Autenticação por seção está comentada pois foi implementada a por token, mas pode ter as duas
@@ -25,14 +27,8 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
-signing = os.environ.get("secretKeyJWT")
-
-if signing:
-    signing_key = signing
-else:
-    from .env import *
-
-    signing_key = secretKeyJWT
+load_dotenv()
+signing_key = os.environ.get("secretKeyJWT")
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
