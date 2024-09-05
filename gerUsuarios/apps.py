@@ -42,6 +42,7 @@ def create_default_tipos(sender, **kwargs):
 def create_default_setores(sender, **kwargs):
     Setor = sender.get_model("Setor")
     default_setor = [
+        "Alunos",
         "Direcao Geral",
         "Direcao de Ensino",
         "Docente",

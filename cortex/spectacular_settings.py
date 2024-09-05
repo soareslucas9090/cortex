@@ -34,7 +34,7 @@ SPECTACULAR_SETTINGS = {
         {
             "name": "GerenciamentoDeUsuários.Setores",
             "description": """Rotas relacionadas com os setores dos usuários.\n
-    Setores padrões: "Direcao Geral", "Direcao de Ensino", "Docente", "Coordenacao Informatica", "Coordenacao Eletromecanica","Coordenacao Edificacoes","Coordenacao Meio Ambiente","Coordenacao TADS","Coordenacao Biologia", "Coordenacao Matematica", "Biblioteca", "Contabilidade", "Saude", "Multimeios", "CODIS", "Refeitorio", "Guarita".""",
+    Setores padrões: "Alunos", "Direcao Geral", "Direcao de Ensino", "Docente", "Coordenacao Informatica", "Coordenacao Eletromecanica","Coordenacao Edificacoes","Coordenacao Meio Ambiente","Coordenacao TADS","Coordenacao Biologia", "Coordenacao Matematica", "Biblioteca", "Contabilidade", "Saude", "Multimeios", "CODIS", "Refeitorio", "Guarita".""",
         },
         {
             "name": "GerenciamentoDeUsuários.Matriculas",
