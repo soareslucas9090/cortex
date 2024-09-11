@@ -53,7 +53,7 @@ A documentação está na rota `/api/schema/swagger/`
 
 Primeiro é necessária a criação de um Ambiente Virtual do Python (necessário versão 3.8 ou posterior do Python, mas recomendamos a 3.11), ou `venv`, para isso basta executar `python -m venv venv`. Ao término é necessário ativar a venv, então na mesma pasta que foi criado a pasta do ambiente virtual, rode o comando `venv\scripts\activate` e pronto.
 Para instalar as dependências é necesário rodar o comando `pip install -r requirements.txt` com o Ambiente Virtual Ativo.
-O código busca um arquivo `.env` para procurar as variáveis de ambiente necessárias, caso não ache as variáveis de ambiente instaladas no SO. O arquivo deve seguir os seguintes moldes:
+O código busca um arquivo `.env` para procurar as variáveis de ambiente necessárias, e caso não ache, usará as variáveis de ambiente instaladas no SO. O arquivo deve seguir os seguintes moldes:
 ```
 secretKeyDjango=A chave secreta do Django, usada na criptografia de CSRF Token
 secretKeyJWT=A chave secreta do Django Rest Framework, usada na criptografia dos JWT Tokens
@@ -68,11 +68,13 @@ allowedHosts=*
 csrfTrustedOriginsANDcorsOriginWhitelist=IP do servidor que hosperdará o frontend da aplicação e permitirá acesso à API, caso seja mais de um, divida eles com virgulas sem espaço, como na variável abaixo
 internalIPs=127.0.0.1,localhost,http://127.0.0.1,https://127.0.0.1,http://localhost,https://localhost
 ```
-Colocar o arquivo `.env` na raiz do projeto.
+Colocar o arquivo `.env` na raiz do projeto ou adicionar estas variáveis diretamente no sistema.
 
-Faça a criação do banco de dados com o comando `python manage.py makemigrations` e depois `python manage.py migrate`.
+Faça a criação do banco de dados com o comando `python manage.py migrate`.
 
-Depois de criar o banco, acesse ele por algum cliente, como o DBeaver, e crie a função e tarefa SQL no arquivo `Schedule atualizar rotas.txt` localizado na pasta `/forBD/`. Este código é necessário para o fechamento automático de rotas.
+Depois de criar o banco, acesse ele por algum cliente, como o DBeaver, e crie a função do arquivo `atualizar_rotas.sql` localizado na pasta `/forBD/`. Este código é necessário para o fechamento automático de rotas. Após isso:
+- Caso seu sistema seja Linux, siga o tutorial para a criação da schedule presente no arquivo `Schedule atualizar rotas.txt` (na mesma pasta que o arquivo sql), sendo necessário a instalação do `pg_cron`.
+- Caso se sistema seja Windows, siga as etapas descritas no arquivo `Schedule atualizar rotas.txt`, que irá criar uma Tarefa Agendada para executar um comando SQL que rodará a função `atualizar_rotas();` a cada 20 minutos. Um detalhe importante para este caso é que o arquivo `exec_atualizar_rotas.bat` precisa ser editado com as as credenciais e nome de banco corretos para pleno funcionamento, sendo possível fazer referência a uma variável de ambiente no sistema com `%nome_da_variavel%`.
 
 Crie um super usuário com o comando `python manage.py createsuperuser` e forneça os dados que vão ser pedidos.
 
@@ -82,7 +84,7 @@ Com tudo configurado, o servidor para rodar o sistema em qualquer computador com
 O servidor para rodar o sistema em um computador Linux é o "Gunicorn", e o comando é:
 `gunicorn cortex.wsgi --workers 2 --bind :8000 --access-logfile -`
 
-O serviço rodará no IP local, sendo acessível pela porta 8000 (é necessário a liberação da porta no Firewall do sistema e da rede. A porta também pode ser mudada por qualquer uma disponível. Exemplo: Servidor com IP `10.7.1.10`, o serviço ficará disponível em `http://10.7.1.10:8000`. Para rodar o sistema em HTTPS é necessário configurações adicionais no servidor.
+O serviço rodará no IP local, sendo acessível pela porta 8000 (é necessário a liberação da porta no Firewall do sistema e da rede. A porta também pode ser mudada por qualquer uma disponível). Exemplo: Servidor com IP `10.7.1.10`, o serviço ficará disponível em `http://10.7.1.10:8000`. Para rodar o sistema em HTTPS é necessário configurações adicionais no servidor.
 
 ## Lógica
 

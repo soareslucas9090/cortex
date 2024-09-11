@@ -67,7 +67,7 @@ class Contato(Base):
 
 class Empresa(Base):
     contato = models.ForeignKey(
-        Contato, related_name="empresa_contato", on_delete=models.RESTRICT, null=False
+        Contato, related_name="empresa_contato", on_delete=models.RESTRICT, null=True
     )
     nome = models.CharField(max_length=30, null=False, unique=True)
     cnpj = models.CharField(max_length=14, unique=True, null=False)

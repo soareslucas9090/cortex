@@ -1,3 +1,6 @@
+=======================================================================================================
+Função SQL (a mesma do arquivo "atualizar_rotas.sql"):
+=======================================================================================================
 Função que procura por toda rota que seja de dias anteriores, ou do dia atual, mas que o horário seja
     menor que o horário atual + 10 minutos (de tolerância):
 
@@ -14,6 +17,8 @@ END;
 $$ LANGUAGE plpgsql;
 
 =======================================================================================================
+Para sistemas Linux (necessário instalação do PGCRON):
+=======================================================================================================
 Código para criar uma schedule que executa de 20 em 20 minutos e chama a função "atualizar_rotas()":
 
 SELECT cron.schedule('schedule_atualizar_rotas', '*/20 * * * *', 'SELECT atualizar_rotas()');
@@ -25,3 +30,14 @@ SELECT cron.alter_job(
   job_id := (SELECT jobid FROM cron.job WHERE jobname = 'schedule_atualizar_rotas'),
   schedule := '*/XX * * * *'
 );
+
+=======================================================================================================
+Para sistemas Windows:
+=======================================================================================================
+Execute o arquivo "atualizar_rotas.sql" para criar a função de atualizar as rotas do sistema
+
+Abra o Agendador de Tarefas (é possível executar o Task Scheduler com Windows + R -> taskschd.msc -> Enter)
+e crie uma nova tarefa com o nome "Atualizar Rotas Soticon no PostgreSQL". Vá em gatilhos e coloque
+para a tarefa se repetir a cada 20 minutos (ou menos), e defina "indefinidamente" para o prazo da
+tarefa. Em "Ação" selecione "Iniciar um programa" e selecione o arquivo "exec_atualizar_rotas.bat",
+salve a tarefa e estará tudo OK.
