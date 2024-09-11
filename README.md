@@ -51,7 +51,8 @@ A documentação está na rota `/api/schema/swagger/`
 
 # Rodando o projeto
 
-Primeiro é necessária a criação de um Ambiente Virtual do Python (necessário versão 3.8 ou posterior do Python, mas recomendamos a 3.11), ou `venv`, para isso basta executar `python -m venv venv`. Ao término é necessário ativar a venv, então na mesma pasta que foi criado a pasta do ambiente virtual, rode o comando `venv\scripts\activate` e pronto.
+Primeiro é necessária a criação de um Ambiente Virtual do Python (necessário versão 3.8 ou posterior do Python, mas recomendamos a 3.11), ou `venv`, para isso basta executar `python -m venv venv`. Ao término é necessário ativar a venv, então na mesma pasta que foi criado a pasta do ambiente virtual, rode o comando `venv\scripts\activate` para Windows, ou `venv/bin/activate` praa Linux, e pronto.
+
 Para instalar as dependências é necesário rodar o comando `pip install -r requirements.txt` com o Ambiente Virtual Ativo.
 O código busca um arquivo `.env` para procurar as variáveis de ambiente necessárias, e caso não ache, usará as variáveis de ambiente instaladas no SO. O arquivo deve seguir os seguintes moldes:
 ```
@@ -75,6 +76,8 @@ Faça a criação do banco de dados com o comando `python manage.py migrate`.
 Depois de criar o banco, acesse ele por algum cliente, como o DBeaver, e crie a função do arquivo `atualizar_rotas.sql` localizado na pasta `/forBD/`. Este código é necessário para o fechamento automático de rotas. Após isso:
 - Caso seu sistema seja Linux, siga o tutorial para a criação da schedule presente no arquivo `Schedule atualizar rotas.txt` (na mesma pasta que o arquivo sql), sendo necessário a instalação do `pg_cron`.
 - Caso se sistema seja Windows, siga as etapas descritas no arquivo `Schedule atualizar rotas.txt`, que irá criar uma Tarefa Agendada para executar um comando SQL que rodará a função `atualizar_rotas();` a cada 20 minutos. Um detalhe importante para este caso é que o arquivo `exec_atualizar_rotas.bat` precisa ser editado com as as credenciais e nome de banco corretos para pleno funcionamento, sendo possível fazer referência a uma variável de ambiente no sistema com `%nome_da_variavel%`.
+
+Execute um `python manage.py collectstatic` para criar os arquivos estáticos da documentação da API, pois sem este comando, o Swagger não consegue executar os arquivos CSS e JS necessários para rodar a sua interface. 
 
 Crie um super usuário com o comando `python manage.py createsuperuser` e forneça os dados que vão ser pedidos.
 
@@ -118,4 +121,6 @@ Abaixo está o DER do SOTICON:
 
 ## Autenticação
 
- O Access Token da API tem duração de 15 minutos, enquanto o Refresh Token tem duração de 40 minutos.
+O Access Token da API tem duração de 15 minutos, enquanto o Refresh Token tem duração de 40 minutos. Estes valores podem ser mudados no arquivo `cortex\rest_frameword_settings.py` em `ACCESS_TOKEN_LIFETIME` e `REFRESH_TOKEN_LIFETIME`.
+
+A autenticação da API segue o padrão Bearer Token, onde o Header `Authorization` deve conter o valor `Bearer SeuTokenDeAcessoAqui`.
