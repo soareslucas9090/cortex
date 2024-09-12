@@ -68,6 +68,8 @@ bdPort=Porta do banco
 allowedHosts=*
 csrfTrustedOriginsANDcorsOriginWhitelist=IP do servidor que hosperdará o frontend da aplicação e permitirá acesso à API, caso seja mais de um, divida eles com virgulas sem espaço, como na variável abaixo
 internalIPs=127.0.0.1,localhost,http://127.0.0.1,https://127.0.0.1,http://localhost,https://localhost
+DefaultEmailForPasswordReset=email para o envio de códigos de reset de senha
+EmailPassword=senha do email, se for do google, é preciso gerar uma senha de apps
 ```
 Colocar o arquivo `.env` na raiz do projeto ou adicionar estas variáveis diretamente no sistema.
 
@@ -96,9 +98,9 @@ Abaixo está o DER do Cortex:
 <img src="https://i.imgur.com/aVCLgAw.png" alt="DER do Cortex">
 
 ### Explicando os relacionamentos - Cortex
-- **gerUsuarios_user** é a tabela que contém os dados dos usuários. Todo usuário pertence a um tipo, e pode ou não estar relacionado a um contato, e também pode ou não estar relacionado a uma empresa. O campo que serve para Login é o `gerUsuarios_user.cpf`, e o campo que guarda o status de atividade do usuário é `gerUsuarios_user.is_active`. O atributo `gerUsuarios_user.email` deve receber o email instituicional do usuário, pois o email pessoal fica guardado em outra tabela, e este campo pode ser nulo, para cobrir casos em que um usuário não possue um email instituicional (como terceirizados). Os campos `gerUsuarios_user.is_staff` e `gerUsuarios_user.is_superuser` não são usados na lógica padrão da API, mas podem ser importantes em implementações futuras em que se mexa nestes dados diretamente do painel Admin do Django. ***A tabela gerUsuarios_user Contém os usuários cadastrados na API para servir de base para outros sistemas, mas é RECOMENDADO que TODOS os sistemas de tecerceiros possuam sua própria tabela de usuários, e guardem apenas uma tabela ao id da tabela gerUsuarios_user***.
+- **gerUsuarios_user** é a tabela que contém os dados dos usuários. Todo usuário pertence a um tipo, e pode ou não estar relacionado a um contato, e também pode ou não estar relacionado a uma empresa. O campo que serve para Login é o `gerUsuarios_user.cpf`, e o campo que guarda o status de atividade do usuário é `gerUsuarios_user.is_active`. O atributo `gerUsuarios_user.email` deve receber o email instituicional do usuário, pois o email pessoal fica guardado em outra tabela. Para cobrir casos em que um usuário não possue um email instituicional (como terceirizados), insira o email com o seguinte formato: `nomeDoUsuario+nomeDoTipo@invalidemail.com`. Colocar os emails assim como inválidos é importante para evitar problemas com o reset de senha. Os campos `gerUsuarios_user.is_staff` e `gerUsuarios_user.is_superuser` não são usados na lógica padrão da API, mas podem ser importantes em implementações futuras em que se mexa nestes dados diretamente do painel Admin do Django. ***A tabela gerUsuarios_user Contém os usuários cadastrados na API para servir de base para outros sistemas, mas é RECOMENDADO que TODOS os sistemas de tecerceiros possuam sua própria tabela de usuários, e guardem apenas uma tabela ao id da tabela gerUsuarios_user***.
 - **gerUsuarios_tipo** guarda os tipos possíveis dos usuários, sendo que vários deles são previamente carregados com a aplicação (vide documentação para detalhes)
-- **gerUsuarios_setor ** & **gerUsuarios_setor_user** guardam a relação entre os setores que os usuários pertecem, que podem ser 0 ou vários.
+- **gerUsuarios_setor** & **gerUsuarios_setor_user** guardam a relação entre os setores que os usuários pertecem, que podem ser 0 ou vários.
 - **gerUsuarios_matricula** é responsável por detalhar as matrículas que o usuário possue. Sendo assim, um usuário pode ter nenhuma, uma ou várias matrículas, mas é sempre bom lembrar que somente é recomendado que uma esteja ativa.
 - **gerUsuarios_contato** possue os campos que salvam os meios de contatos "personalizados" para cada usuário ou empresa.
 - **gerUsuarios_endereco** guarda os dados do endereço do usuário ou empresa, e está relacionada com a tabela contato.
