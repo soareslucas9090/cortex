@@ -72,9 +72,7 @@ def create_default_empresa(sender, **kwargs):
     Empresa = sender.get_model("Empresa")
 
     try:
-        Empresa.objects.get_or_create(
-            nome__iexact="IFPI - Campus Floriano", cnpj="10806496000491"
-        )
-    except OperationalError:
-        print("Não foi possível realizar migrate de dados de Empresas")
+        Empresa.objects.get(cnpj="10806496000491")
+    except:
+        Empresa.objects.create(cnpj="10806496000491", nome="IFPI - Campus Floriano")
         pass
