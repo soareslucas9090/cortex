@@ -155,7 +155,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     nome = models.CharField(max_length=255, null=False)
-    email = models.EmailField(unique=True, null=True)
+    email = models.EmailField(unique=True, null=False)
     tipo = models.ForeignKey(
         Tipo, related_name="user_tipo", on_delete=models.RESTRICT, null=False
     )
