@@ -32,6 +32,18 @@ SPECTACULAR_SETTINGS = {
             "description": "Rotas relacionadas com os usuários",
         },
         {
+            "name": "GerenciamentoDeUsuários.SolicitarResetSenha",
+            "description": "Rota responsável por enviar o email para o reset de senha do usuário",
+        },
+        {
+            "name": "GerenciamentoDeUsuários.ConfirmarCodigoResetSenha",
+            "description": "Rota responsável por cnfirmar o código de reset do usuário",
+        },
+        {
+            "name": "GerenciamentoDeUsuários.ConfirmarResetSenha",
+            "description": "Rota responsável por receber a nova senha do usuário",
+        },
+        {
             "name": "GerenciamentoDeUsuários.Setores",
             "description": """Rotas relacionadas com os setores dos usuários.\n
     Setores padrões: "Alunos", "Direcao Geral", "Direcao de Ensino", "Coordenacao Informatica", "Coordenacao Eletromecanica", "Coordenacao Edificacoes", "Coordenacao Meio Ambiente", "Coordenacao TADS", "Coordenacao Biologia", "Coordenacao Matematica", "Biblioteca", "Contabilidade", "Saude", "Multimeios", "CODIS", "Refeitorio", "Guarita".""",

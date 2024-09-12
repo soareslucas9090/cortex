@@ -41,6 +41,55 @@ class User2AdminSerializer(serializers.ModelSerializer):
             return None
 
 
+class PasswordResetRequestSerializer(serializers.Serializer):
+    cpf = serializers.CharField(write_only=True)
+
+    def validate_cpf(self, value):
+        if len(value) != 11:
+            raise serializers.ValidationError("CPF inválido.")
+
+        return value
+
+
+class PasswordResetCodeConfirmSerializer(serializers.Serializer):
+    cpf = serializers.CharField(write_only=True)
+    code = serializers.IntegerField(write_only=True)
+
+    def validate_cpf(self, value):
+        if len(value) != 11:
+            raise serializers.ValidationError("CPF inválido.")
+
+        return value
+
+    def validate_code(self, value):
+        if value < 1000 or value > 9999:
+            raise serializers.ValidationError(
+                "O código deve possuir 4 dígitos numéricos."
+            )
+
+        return value
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    cpf = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True)
+    password_confirm = serializers.CharField(write_only=True)
+
+    def validate_cpf(self, value):
+        if len(value) != 11:
+            raise serializers.ValidationError("CPF inválido.")
+
+        return value
+
+    def validate_password(self, value):
+        if len(value) < 8:
+            raise serializers.ValidationError(
+                "A senha precisa ter 8 caracteres ou mais."
+            )
+
+        return value
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

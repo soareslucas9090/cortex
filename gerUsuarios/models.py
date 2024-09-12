@@ -6,6 +6,7 @@ from django.contrib.auth.models import (
     User,
 )
 from django.db import models
+from django.utils import timezone
 
 
 class Base(models.Model):
@@ -196,6 +197,27 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = "user"
         verbose_name_plural = "users"
+
+
+class PasswordResetCode(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expiration_time = models.DateTimeField(null=False)
+    code = models.IntegerField(null=False)
+    validated = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"User {self.user}, code {self.code}"
+
+    def is_expired(self):
+        return self.expiration_time < timezone.now()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "code"], name="unique_code_user_constraint"
+            )
+        ]
 
 
 class Setor(Base):

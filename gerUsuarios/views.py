@@ -1,9 +1,22 @@
+import random
+from datetime import timedelta
+
+from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AnonymousUser
+from django.core.mail import EmailMultiAlternatives
+from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
+from drf_spectacular.utils import (
+    OpenApiExample,
+    OpenApiParameter,
+    OpenApiResponse,
+    extend_schema,
+)
 from rest_framework import status
+from rest_framework.generics import GenericAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -211,7 +224,7 @@ class UserViewSet(ModelViewSet):
         cpf = self.request.query_params.get("cpf", None)
 
         if cpf and cpf.isnumeric():
-            queryset = queryset.filter(cpf=cpf)
+            queryset = queryset.filter(cpf__icontains=cpf)
 
         return queryset
 
@@ -267,6 +280,273 @@ class UserViewSet(ModelViewSet):
             return [IsAdminOrTI()]
 
         return super().get_permissions()
+
+
+@extend_schema(tags=["GerenciamentoDeUsuários.SolicitarResetSenha"])
+class PasswordResetRequestAPIView(GenericAPIView):
+    serializer_class = PasswordResetRequestSerializer
+    http_method_names = ["post"]
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(
+                description="Email enviado com sucesso."
+            ),
+            status.HTTP_403_FORBIDDEN: OpenApiResponse(
+                description="Usuário não possue email cadastrado."
+            ),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(
+                description="Usuário não encontrado."
+            ),
+            status.HTTP_500_INTERNAL_SERVER_ERROR: OpenApiResponse(
+                description="Erro interno."
+            ),
+        }
+    )
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer = serializer.validated_data
+
+        try:
+            user = User.objects.get(cpf=serializer["cpf"])
+        except:
+            return Response(
+                {"Não existe usuário com este CPF."}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        if "invalidemail.com" in user.email:
+            return Response(
+                {
+                    "O usuário não possui email cadastrado. Por favor, entre em contato com o TI."
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        random_code = random.randrange(1000, 9999)
+        expiration_time = timezone.now() + timedelta(minutes=15)
+
+        try:
+            old_code = PasswordResetCode.objects.get(user=user)
+            old_code.delete()
+        except:
+            pass
+
+        code = PasswordResetCode.objects.create(
+            user=user,
+            expiration_time=expiration_time,
+            code=random_code,
+        )
+
+        first_html = """
+        <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Código P/ Nova Senha</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                        max-width: 600px;
+                        margin: 0 auto;
+                        padding: 20px;
+                        background-color: #f4f4f4;
+                    }
+                    .email-container {
+                        background-color: white;
+                        padding: 20px;
+                        border-radius: 8px;
+                        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+                        border: 1px solid #e0e0e0;
+                        max-width: 600px;
+                        margin: 40px auto;
+                    }
+                    h2 {
+                        text-align: center;
+                        color: #333;
+                    }
+                    .code-container {
+                        background-color: #4CAF50;
+                        color: white;
+                        font-size: 24px;
+                        font-weight: bold;
+                        text-align: center;
+                        padding: 15px;
+                        border-radius: 8px;
+                        margin: 20px auto;
+                        max-width: 150px;
+                    }
+                    .footer {
+                        text-align: center;
+                        margin-top: 20px;
+                        font-size: 14px;
+                        color: #666;
+                    }
+                    .footer a {
+                        color: #4CAF50;
+                        text-decoration: none;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="email-container">
+                    <h2>Reset de Senha</h2>
+                    <p>Olá,</p>
+                    <p>Recebemos uma solicitação para redefinir a senha da sua conta. Por favor, use o código abaixo na tela de reset de senha para concluir o processo:</p>
+                    
+                    <div class="code-container">
+        """
+
+        second_html = f"""
+                    {code.code}
+                    </div>
+                    
+                    <p>Se você não solicitou uma redefinição de senha, por favor, ignore este email ou entre em contato com o suporte.</p>
+                    
+                    <div class="footer">
+                        IFPI - Campus Floriano - Cortex<br>
+                    </div>
+                </div>
+            </body>
+        </html>
+        """
+
+        final_html = first_html
+        final_html += second_html
+
+        # Crie a instância do email usando EmailMultiAlternatives
+        email = EmailMultiAlternatives(
+            "Recuperação de senha",
+            f"Código de recuperação de senha: {code.code}",  # Texto simples alternativo
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+        )
+
+        email.attach_alternative(final_html, "text/html")  # Corpo em HTML
+
+        try:
+            email.send()
+            return Response(
+                {"success": "E-mail com o código enviado com sucesso!"},
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            return Response(
+                {"error": "Erro ao enviar o e-mail"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+@extend_schema(tags=["GerenciamentoDeUsuários.ConfirmarCodigoResetSenha"])
+class PasswordResetCodeConfirmAPIView(GenericAPIView):
+    serializer_class = PasswordResetCodeConfirmSerializer
+    http_method_names = ["post"]
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(description="Código Válido."),
+            status.HTTP_403_FORBIDDEN: OpenApiResponse(description="Código expirado."),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(
+                description="Usuário não encontrado."
+            ),
+            status.HTTP_500_INTERNAL_SERVER_ERROR: OpenApiResponse(
+                description="Erro interno."
+            ),
+        }
+    )
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer = serializer.validated_data
+
+        try:
+            user = User.objects.get(cpf=serializer["cpf"])
+        except:
+            return Response(
+                {"error": "Não existe usuário com este CPF."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        try:
+            valid_code = PasswordResetCode.objects.get(
+                user=user, code=serializer["code"]
+            )
+        except:
+            return Response(
+                {"error": "Este código não existe."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if valid_code.is_expired():
+            valid_code.delete()
+            return Response(
+                {"error": "Este código expirou."}, status=status.HTTP_403_FORBIDDEN
+            )
+
+        valid_code.validated = True
+        valid_code.save()
+
+        return Response({"success": "Código válido."}, status=status.HTTP_200_OK)
+
+
+@extend_schema(tags=["GerenciamentoDeUsuários.ConfirmarResetSenha"])
+class PasswordResetConfirmAPIView(GenericAPIView):
+    serializer_class = PasswordResetConfirmSerializer
+    http_method_names = ["post"]
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        responses={
+            status.HTTP_200_OK: OpenApiResponse(description="Reset feito."),
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+                description="Senhas não conferem"
+            ),
+            status.HTTP_404_NOT_FOUND: OpenApiResponse(
+                description="Usuário não encontrado."
+            ),
+            status.HTTP_500_INTERNAL_SERVER_ERROR: OpenApiResponse(
+                description="Erro interno."
+            ),
+        }
+    )
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer = serializer.validated_data
+
+        try:
+            user = User.objects.get(cpf=serializer["cpf"])
+        except:
+            return Response(
+                {"error": "Não existe usuário com este CPF."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        try:
+            valid_code = PasswordResetCode.objects.get(user=user, validated=True)
+        except:
+            return Response(
+                {"error": "Não há código de reset de senha válido para o usuário."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if serializer["password"] != serializer["password_confirm"]:
+            return Response(
+                {"error": "Senhas não conferem."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        nova_senha = make_password(serializer["password"])
+
+        user.password = nova_senha
+
+        user.save()
+
+        valid_code.delete()
+
+        return Response({"success": "Senha atualizada."}, status=status.HTTP_200_OK)
 
 
 @extend_schema(tags=["GerenciamentoDeUsuários.Setores"])

@@ -15,4 +15,17 @@ blog_router.register("matriculas", MatriculaViewSet)
 
 urlpatterns = [
     path("", include(blog_router.urls)),
+    path(
+        "password/reset/", PasswordResetRequestAPIView.as_view(), name="reset-password"
+    ),
+    path(
+        "password/reset/code",
+        PasswordResetCodeConfirmAPIView.as_view(),
+        name="confirm-code",
+    ),
+    path(
+        "password/reset/confirm",
+        PasswordResetConfirmAPIView.as_view(),
+        name="confirm-password",
+    ),
 ]
