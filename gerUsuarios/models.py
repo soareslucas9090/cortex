@@ -33,9 +33,9 @@ class Endereco(Base):
     cidade = models.CharField(max_length=60, null=False)
     estado = models.CharField(max_length=2, null=False)
     bairro = models.CharField(max_length=30, null=False)
-    cep = models.CharField(max_length=8, null=False)
+    cep = models.CharField(max_length=8, null=True)
     complemento = models.CharField(max_length=30, null=True)
-    num_casa = models.IntegerField(null=False)
+    num_casa = models.IntegerField(null=True)
 
     def __str__(self):
         str = f"{self.logradouro}"
