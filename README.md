@@ -1,3 +1,4 @@
+
 # Cortex & SOTICON API
 
 <img align="center" alt="Python" width="30" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg"><span>&nbsp;&nbsp;&nbsp;</span>
@@ -83,13 +84,98 @@ Execute um `python manage.py collectstatic` para criar os arquivos estáticos da
 
 Crie um super usuário com o comando `python manage.py createsuperuser` e forneça os dados que vão ser pedidos.
 
-Com tudo configurado, o servidor para rodar o sistema em qualquer computador com Windows 8+ ou Server 2012+ é o "Waitress", e o comando para iniciar é:
+Com tudo configurado, o servidor para rodar o sistema em qualquer computador com Windows 8+ ou Server 2012+ é o "Waitress", e o comando para iniciar é (lembrando que a *venv* deve estar ativada, e o comando deve ser executado na raiz do projeto):
 `waitress-serve --port=8000 cortex.wsgi:application`
 
 O servidor para rodar o sistema em um computador Linux é o "Gunicorn", e o comando é:
 `gunicorn cortex.wsgi --workers 2 --bind :8000 --access-logfile -`
 
+### ATENÇÃO
+***ESTES COMANDOS RODAM O SERVIDOR APENAS EM HTTP, PARA RODAR EM HTTPS É NECESSÁRIO REALIZAR OS COMANDO APRESENTADOS NA PRÓXIMA SEÇÃO.***
+
 O serviço rodará no IP local, sendo acessível pela porta 8000 (é necessário a liberação da porta no Firewall do sistema e da rede. A porta também pode ser mudada por qualquer uma disponível). Exemplo: Servidor com IP `10.7.1.10`, o serviço ficará disponível em `http://10.7.1.10:8000`. Para rodar o sistema em HTTPS é necessário configurações adicionais no servidor.
+
+## HTTPS
+
+Como dito acima, os comandos do Waitress e Gunicorn rodam o servidor apenas em HTTP, para rodar no protocolo HTTPS, é preciso de um servidor de *proxy reverso*. Neste tutorial será usado o Nginx em um SO Windows.
+
+### 1º - Gerando certificado SSL autoassinado
+
+(Se você possuir um certificado emitido por um cliente de certificação, pode pular este passo)
+
+- Instale o OpenSSL Light. [Link aqui](https://slproweb.com/products/Win32OpenSSL.html).
+- Escolha a opção de copiar as DLLs do OpenSSL para o diretório `/bin` da aplicação.
+- Adicione o Diretório de instalação ao Path do Windows (`C:\Program Files\OpenSSL-Win64\bin` por padrão).
+- Abra o Powershell como administrador, e execute `New-SelfSignedCertificate -DnsName "localhost" -CertStoreLocation "cert:\LocalMachine\My" -NotAfter (Get-Date).AddYears(5)`. Isso irá criar um certificado autoassinado com o DNS `localhost` e o coloca no Windows Certificate Store.
+- Exporte o certificado em formato `.pfx` com os seguintes códigos:
+-- `$cert = Get-ChildItem -Path cert:\LocalMachine\My | Where-Object { $_.Subject -like "CN=localhost" }`
+-- `$pwd = ConvertTo-SecureString -String "password" -Force -AsPlainText` (substitua `password` pela senha que desenha colocar no certificado.
+-- `Export-PfxCertificate -Cert $cert -FilePath C:\caminho\do\certificado.pfx -Password $pwd`
+- Separe o certificado `.pfx` em dois arquivos `.pem`:
+-- O código do certificado com o código `openssl pkcs12 -in C:\path\to\cert.pfx -clcerts -nokeys -out C:\caminho\do\certificado.pem`
+-- A chave privada do certicado com o código `openssl pkcs12 -in C:\path\to\cert.pfx -nocerts -out C:\caminhi\da\chave.pem -nodes`
+
+### 2º - Instalando o Nginx
+
+- Faça o download do Nginx para windows em >https://nginx.org/en/download.html.
+- Extraia o `.zip` para a raiz do Disco Loca (C:).
+- Vá até `C:\nginx\nginx.conf` e abra este arquivo no editor de texto de sua preferência
+- Apague todo o conteúdo, e cole o código abaixo, personalizando o que for necessário:
+```nginx.conf
+worker_processes 1; # Número de processos de trabalho
+
+events {
+worker_connections 128; # Número máximo de conexões simultâneas
+}
+
+http {
+	include mime.types;
+	default_type application/octet-stream;
+
+	server {
+		listen 80; # A porta HTTP, que o Nginx estará escutando
+
+		server_name localhost; # Substitua polo seu domínio ou deixe localhost
+			
+		# Redirecionar todas as requisições para HTTPS
+		return 301 https://$host$request_uri;
+	}	
+
+	server {
+		listen 443 ssl; # A porta HTTPS, que o Nginx estará escutando
+		
+		server_name localhost; # Substitua polo seu domínio ou deixe localhost
+
+		ssl_certificate C:/caminho/do/certificado.pem; # Caminho para o certificado
+
+		ssl_certificate_key C:/caminho/da/chave.pem; # Caminho para a chave privada
+
+		location / {
+
+			proxy_pass http://127.0.0.1:8000; # onde o Waitress estará ouvindo
+
+			proxy_set_header Host $host;
+
+			proxy_set_header X-Real-IP $remote_addr;
+
+			proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+			proxy_set_header X-Forwarded-Proto $scheme;
+
+		}
+
+	}
+
+}
+```
+- Desta forma, as requições feitas em http://127.0.0.1 ou http://localhost serão automaticamente redirecionadas para https://127.0.0.1 ou https://localhost.
+
+### ATENÇÃO
+***O SERVIDOR NGINX E O WAITRESS DEVEM RODAR EM PARALELO***
+
+- Agora vá em `C:\nginx`, abra uma janela do CMD e execute o comando `nginx -t`. Deverá informar que está tudo OK com as configurações.
+- Por fim, ainda em `C:\nginx`, execute `start nginx` no CMD. O processo do Nginx rodará de fundo.
+
 
 ## Lógica
 
