@@ -176,6 +176,19 @@ http {
 - Agora vá em `C:\nginx`, abra uma janela do CMD e execute o comando `nginx -t`. Deverá informar que está tudo OK com as configurações.
 - Por fim, ainda em `C:\nginx`, execute `start nginx` no CMD. O processo do Nginx rodará de fundo.
 
+## Inserção de Usuários em Lote
+
+Para a inserção em lote de Usuários é necessário rodar o script `inserir_alunos.py` ou `inserir_usuarios.py` presente em `./insert_users/` enquanto o servidor está ativo, pois a inserção é feita com os endpoints da API. 
+Antes da execução, abra o script e edite as variáveis `CPF` e `PASSWORD` com os valores reais de um usuário com permissão de inserção.
+Para a inserção de alunos é necessário um arquivo Excel, com o nome e extenção `alunos.xlsx`, seguindo a seguinte estrutura à risca, inclusive as letras maiúsculas, minúsculas e acentos:
+
+|CPF|Matrícula|Nome|Ano Letivo de Previsão de Conclusão|Bairro|Cidade|Data de Matrícula|Data de Nascimento|Endereço|Telefone|
+|-|-|-|-|-|-|-|-|-|-|
+|031.111.443-22|20141S.55.38|Gustavo Souza Cruz|2020|Ininga|TERESINA|27/12/2019 00:00:00|05/09/1990|Rua Tereza Feitosa, 1881B, Nossa Senhora das Gracas, 64519-410, Teresina-PI|(86) 99999-0000, (86) 99900-0099|
+### Atenção: A coluna endereço deve estar exatamente nesta ordem -> Rua, Número + Complemento (coloque "sn" se não houver), Bairro, CEP, Cidade-Estado (O Estado deve estar abreviado em dois dígitos, como no exemplo acima)
+Na onde se encontra o script, também há um arquivo chamado `alunos.xlsx` para servir de exemplo.
+
+O Script para criação de usuários de outros tipos ainda está sendo desenvolvido.
 
 ## Lógica
 
