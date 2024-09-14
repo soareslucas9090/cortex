@@ -27,7 +27,7 @@ from .permissions import *
 from .serializers import *
 
 
-@extend_schema(tags=["GerenciamentoDeUsuários.Tipos"])
+@extend_schema(tags=["Gerenciamento De Usuários.Tipos"])
 class TipoViewSet(ModelViewSet):
     queryset = Tipo.objects.all()
     serializer_class = TipoSerializer
@@ -67,7 +67,7 @@ class TipoViewSet(ModelViewSet):
         return super().get_permissions()
 
 
-@extend_schema(tags=["GerenciamentoDeUsuários.Enderecos"])
+@extend_schema(tags=["Gerenciamento De Usuários.Enderecos"])
 class EnderecoViewSet(ModelViewSet):
     queryset = Endereco.objects.all()
     serializer_class = EnderecoSerializer
@@ -91,7 +91,7 @@ class EnderecoViewSet(ModelViewSet):
         return super().get_permissions()
 
 
-@extend_schema(tags=["GerenciamentoDeUsuários.Contatos"])
+@extend_schema(tags=["Gerenciamento De Usuários.Contatos"])
 class ContatoViewSet(ModelViewSet):
     queryset = Contato.objects.all()
     serializer_class = ContatoSerializer
@@ -146,7 +146,7 @@ class ContatoViewSet(ModelViewSet):
         return super().get_permissions()
 
 
-@extend_schema(tags=["GerenciamentoDeUsuários.Empresas"])
+@extend_schema(tags=["Gerenciamento De Usuários.Empresas"])
 class EmpresaViewSet(ModelViewSet):
     queryset = Empresa.objects.all()
     serializer_class = EmpresaSerializer
@@ -201,7 +201,7 @@ class EmpresaViewSet(ModelViewSet):
         return super().get_permissions()
 
 
-@extend_schema(tags=["GerenciamentoDeUsuários.Usuários"])
+@extend_schema(tags=["Gerenciamento De Usuários.Usuários"])
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -282,7 +282,7 @@ class UserViewSet(ModelViewSet):
         return super().get_permissions()
 
 
-@extend_schema(tags=["GerenciamentoDeUsuários.SolicitarResetSenha"])
+@extend_schema(tags=["Gerenciamento De Usuários.Solicitar Reset de Senha"])
 class PasswordResetRequestAPIView(GenericAPIView):
     serializer_class = PasswordResetRequestSerializer
     http_method_names = ["post"]
@@ -440,7 +440,7 @@ class PasswordResetRequestAPIView(GenericAPIView):
             )
 
 
-@extend_schema(tags=["GerenciamentoDeUsuários.ConfirmarCodigoResetSenha"])
+@extend_schema(tags=["Gerenciamento De Usuários.Confirmar Codigo Reset de Senha"])
 class PasswordResetCodeConfirmAPIView(GenericAPIView):
     serializer_class = PasswordResetCodeConfirmSerializer
     http_method_names = ["post"]
@@ -492,7 +492,7 @@ class PasswordResetCodeConfirmAPIView(GenericAPIView):
         return Response({"success": "Código válido."}, status=status.HTTP_200_OK)
 
 
-@extend_schema(tags=["GerenciamentoDeUsuários.ConfirmarResetSenha"])
+@extend_schema(tags=["Gerenciamento De Usuários.Confirmar Reset de Senha"])
 class PasswordResetConfirmAPIView(GenericAPIView):
     serializer_class = PasswordResetConfirmSerializer
     http_method_names = ["post"]
@@ -549,7 +549,127 @@ class PasswordResetConfirmAPIView(GenericAPIView):
         return Response({"success": "Senha atualizada."}, status=status.HTTP_200_OK)
 
 
-@extend_schema(tags=["GerenciamentoDeUsuários.Setores"])
+@extend_schema(tags=["Gerenciamento De Usuários.Inserir Vários Alunos"])
+class InserirVariosAlunosCompletosView(GenericAPIView):
+    serializer_class = InserirVariosAlunosCompletosWrapperSerializer
+    http_method_names = ["post"]
+    permission_classes = [IsAdminOrTI]
+
+    @extend_schema(
+        examples=[
+            OpenApiExample(
+                "Exemplo de Inserção de Aluno",
+                value=[
+                    {
+                        "endereco": {
+                            "logradouro": "(Obrigatório) Rua Exemplo",
+                            "cidade": "(Obrigatório) Exemplo City",
+                            "estado": "(Obrigatório) PI",
+                            "bairro": "(Obrigatório) Bairro Exemplo",
+                            "cep": "(Opcional) 64800000",
+                            "complemento": "(Opcional) P4, APT5",
+                            "num_casa": 123,
+                        },
+                        "email_externo": "emailPessoal@gmail.com",
+                        "tel": "11999999999",
+                        "cpf": "12345678900",
+                        "nome": "João Exemplo",
+                        "data_nascimento": "1990-12-30",
+                        "matricula": "202312345",
+                        "validade_matricula": "2025-01-01",
+                        "expedicao_matricula": "2023-01-01",
+                    }
+                ],
+            )
+        ],
+        responses={
+            status.HTTP_201_CREATED: OpenApiResponse(description="Usários criados."),
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(description="Dados errados."),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
+                description="Não autorizado."
+            ),
+            status.HTTP_500_INTERNAL_SERVER_ERROR: OpenApiResponse(
+                description="Erro interno."
+            ),
+        },
+    )
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=True)
+
+        # Valida os dados
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"detail": "Usuários criados com sucesso!"},
+                status=status.HTTP_201_CREATED,
+            )
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@extend_schema(tags=["Gerenciamento De Usuários.Inserir Vários Usuários"])
+class InserirVariosUsuariosCompletosView(GenericAPIView):
+    serializer_class = InserirVariosUsuariosCompletosWrapperSerializer
+    http_method_names = ["post"]
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        examples=[
+            OpenApiExample(
+                "Exemplo de Inserção de Aluno",
+                value=[
+                    {
+                        "endereco": {
+                            "logradouro": "(Obrigatório) Rua Exemplo",
+                            "cidade": "(Obrigatório) Exemplo City",
+                            "estado": "(Obrigatório) PI",
+                            "bairro": "(Obrigatório) Bairro Exemplo",
+                            "cep": "(Opcional) 64800000",
+                            "complemento": "(Opcional) P4, APT5",
+                            "num_casa(Opcional)": 123,
+                        },
+                        "email_externo": "emailPessoal@gmail.com",
+                        "email_institucional": "emailInterno@ifpi.edu.br",
+                        "tel": "11999999999",
+                        "cpf": "12345678900",
+                        "nome": "João Exemplo",
+                        "cnpj_empresa": "12345678901234",
+                        "tipo": "professor",
+                        "setores": ["Coordenacao Informatica", "Coordenacao TADS"],
+                        "data_nascimento": "1990-12-30",
+                        "matricula": "202312345",
+                        "validade_matricula": "2025-01-01",
+                        "expedicao_matricula": "2023-01-01",
+                    }
+                ],
+            )
+        ],
+        responses={
+            status.HTTP_201_CREATED: OpenApiResponse(description="Usários criados."),
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(description="Dados errados."),
+            status.HTTP_401_UNAUTHORIZED: OpenApiResponse(
+                description="Não autorizado."
+            ),
+            status.HTTP_500_INTERNAL_SERVER_ERROR: OpenApiResponse(
+                description="Erro interno."
+            ),
+        },
+    )
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=True)
+
+        # Valida os dados
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"detail": "Usuários criados com sucesso!"},
+                status=status.HTTP_201_CREATED,
+            )
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@extend_schema(tags=["Gerenciamento De Usuários.Setores"])
 class SetorViewSet(ModelViewSet):
     queryset = Setor.objects.all()
     serializer_class = SetorSerializer
@@ -604,7 +724,7 @@ class SetorUserViewSet(ModelViewSet):
         return super().get_permissions()
 
 
-@extend_schema(tags=["GerenciamentoDeUsuários.Matriculas"])
+@extend_schema(tags=["Gerenciamento De Usuários.Matriculas"])
 class MatriculaViewSet(ModelViewSet):
     queryset = Matricula.objects.all()
     serializer_class = MatriculaSerializer

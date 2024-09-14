@@ -1,3 +1,5 @@
+from django.contrib.auth.hashers import make_password
+from django.db import IntegrityError, transaction
 from drf_spectacular.utils import OpenApiExample, OpenApiTypes, extend_schema_field
 from rest_framework import serializers
 
@@ -204,6 +206,12 @@ class EnderecoSerializer(serializers.ModelSerializer):
         model = Endereco
         fields = "__all__"
 
+    def validate_cep(self, value):
+        if len(value) != 8:
+            raise serializers.ValidationError("CEP Inválido.")
+
+        return value
+
     def validate_estado(self, value):
         estados = [
             "ac",
@@ -238,7 +246,7 @@ class EnderecoSerializer(serializers.ModelSerializer):
         estado = value.lower()
 
         if estado not in estados:
-            raise serializers.ValidationError("Insira um estado válido")
+            raise serializers.ValidationError("Insira um estado válido (2 dígitos).")
 
         return estado
 
@@ -282,6 +290,269 @@ class Alteracao_UserSerializer(serializers.ModelSerializer):
 
         user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 """
+
+
+class InserirAlunoCompletoSerializer(serializers.Serializer):
+    endereco = EnderecoSerializer()
+    email_externo = serializers.EmailField(required=False)
+    tel = serializers.CharField(required=True)
+    cpf = serializers.CharField(required=True)
+    nome = serializers.CharField(required=True)
+    data_nascimento = serializers.DateField(required=True)
+    matricula = serializers.CharField(required=True)
+    validade_matricula = serializers.DateField(required=True)
+    expedicao_matricula = serializers.DateField(required=True)
+
+    def create(self, validated_data):
+
+        # Usar atomic para garantir que todos os dados sejam inseridos juntos
+        with transaction.atomic():
+            try:
+                endereco_data = validated_data.pop("endereco")
+                email_externo = validated_data.pop("email_externo", None)
+                tel = validated_data.pop("tel")
+                cpf = validated_data.pop("cpf")
+                nome = validated_data.pop("nome")
+                data_nascimento = validated_data.pop("data_nascimento")
+                matricula_data = validated_data.pop("matricula")
+                validade_matricula = validated_data.pop("validade_matricula")
+                expedicao_matricula = validated_data.pop("expedicao_matricula")
+            except Exception as e:
+                raise serializers.ValidationError({"error": e})
+
+            endereco = Endereco.objects.create(**endereco_data)
+            contato = Contato.objects.create(
+                endereco=endereco, email=email_externo, tel=tel
+            )
+
+            email_user = f"caflo.{matricula_data}@aluno.ifpi.edu.br"
+            password_user = make_password(f"{cpf[:6]}{matricula_data[-2:]}")
+            tipo = Tipo.objects.get(nome__iexact="aluno")
+            empresa = Empresa.objects.get(cnpj="10806496000491")
+            setor = Setor.objects.get(nome__iexact="alunos")
+
+            try:
+                usuario = User.objects.create(
+                    nome=nome,
+                    cpf=cpf,
+                    email=email_user,
+                    tipo=tipo,
+                    contato=contato,
+                    empresa=empresa,
+                    data_nascimento=data_nascimento,
+                    password=password_user,
+                )
+            except IntegrityError as e:
+                if "cpf" in str(e):
+                    raise serializers.ValidationError(
+                        {"cpf": f"Este CPF ({cpf}) já está cadastrado."}
+                    )
+                if "email" in str(e):
+                    raise serializers.ValidationError(
+                        {
+                            "email": f"Um usuário com esta matrícula já foi registrado e possui um email ({email_user}) no sistema."
+                        }
+                    )
+
+            usuario.setores.set([setor])
+
+            try:
+                matricula = Matricula.objects.create(
+                    user=usuario,
+                    matricula=matricula_data,
+                    validade=validade_matricula,
+                    expedicao=expedicao_matricula,
+                )
+            except IntegrityError as e:
+                raise serializers.ValidationError(
+                    {
+                        "matricula": f"Um usuário com esta matrícula ({matricula_data}) já foi registrado no sistema."
+                    }
+                )
+
+        return usuario
+
+    def validate_cpf(self, value):
+        if len(value) != 11 and not value.isnumeric():
+            raise serializers.ValidationError("O CPF deve conter 11 dígitos numéricos.")
+
+        return value
+
+    def validate_tel(self, value):
+        if len(value) != 11 and not value.isnumeric():
+            raise serializers.ValidationError(
+                "O telefone deve conter 11 dígitos numéricos."
+            )
+
+        return value
+
+
+class InserirVariosAlunosCompletosSerializer(serializers.ListSerializer):
+    def create(self, validated_data_list):
+        users = []
+        with transaction.atomic():
+            for validated_data in validated_data_list:
+                user = InserirAlunoCompletoSerializer().create(validated_data)
+                users.append(user)
+        return users
+
+
+class InserirVariosAlunosCompletosWrapperSerializer(InserirAlunoCompletoSerializer):
+    class Meta:
+        list_serializer_class = InserirVariosAlunosCompletosSerializer
+
+
+class InserirUsuarioCompletoSerializer(serializers.Serializer):
+    endereco = EnderecoSerializer()
+    email_externo = serializers.EmailField(required=False)
+    email_institucional = serializers.EmailField(required=False)
+    tel = serializers.CharField(required=True)
+    cpf = serializers.CharField(required=True)
+    nome = serializers.CharField(required=True)
+    cnpj_empresa = serializers.CharField(required=True)
+    tipo = serializers.CharField(required=True)
+    setores = serializers.ListField(child=serializers.CharField(), required=False)
+    data_nascimento = serializers.DateField(required=True)
+    matricula = serializers.CharField(required=True)
+    validade_matricula = serializers.DateField(required=True)
+    expedicao_matricula = serializers.DateField(required=True)
+
+    def create(self, validated_data):
+
+        # Usar atomic para garantir que todos os dados sejam inseridos juntos
+        with transaction.atomic():
+
+            try:
+                endereco_data = validated_data.pop("endereco")
+                email_externo = validated_data.pop("email_externo", None)
+                email_institucional = validated_data.pop("email_institucional", None)
+                tel = validated_data.pop("tel")
+                cpf = validated_data.pop("cpf")
+                nome = validated_data.pop("nome")
+                cnpj_empresa = validated_data.pop("cnpj_empresa")
+                tipo_data = validated_data.pop("tipo")
+                setores_data = validated_data.pop("setores", None)
+                data_nascimento = validated_data.pop("data_nascimento")
+                matricula_data = validated_data.pop("matricula")
+                validade_matricula = validated_data.pop("validade_matricula")
+                expedicao_matricula = validated_data.pop("expedicao_matricula")
+            except Exception as e:
+                raise serializers.ValidationError({"error": e})
+
+            endereco = Endereco.objects.create(**endereco_data)
+            contato = Contato.objects.create(
+                endereco=endereco, email=email_externo, tel=tel
+            )
+
+            try:
+                tipo = Tipo.objects.get(nome=tipo_data)
+            except:
+                raise serializers.ValidationError(
+                    {"tipo": f"O tipo {tipo_data} não existe no sistema."}
+                )
+
+            try:
+                setores = []
+
+                for setor in setores_data:
+                    setores.append(Setor.objects.get(nome__iexact=setor))
+
+            except:
+                raise serializers.ValidationError(
+                    {"setores": f"Um dos setores passados não existe no sistema."}
+                )
+
+            try:
+                empresa = Empresa.objects.get(cnpj=cnpj_empresa)
+            except:
+                raise serializers.ValidationError(
+                    {
+                        "empresa": f"A empresa de CNPJ {cnpj_empresa} não está cadastrada no sistema"
+                    }
+                )
+
+            if not email_institucional:
+                email_institucional = f"{matricula_data}@invalidemail.com"
+
+            password_user = make_password(f"{cpf[:6]}{matricula_data[-2:]}")
+
+            try:
+                usuario = User.objects.create(
+                    nome=nome,
+                    cpf=cpf,
+                    email=email_institucional,
+                    tipo=tipo,
+                    contato=contato,
+                    empresa=empresa,
+                    data_nascimento=data_nascimento,
+                    password=password_user,
+                )
+            except IntegrityError as e:
+                if "cpf" in str(e):
+                    raise serializers.ValidationError(
+                        {"cpf": f"Este CPF ({cpf}) já está cadastrado."}
+                    )
+                if "email" in str(e):
+                    raise serializers.ValidationError(
+                        {
+                            "email": f"Um usuário com esta matrícula já foi registrado e possui um email ({email_institucional}) no sistema."
+                        }
+                    )
+
+            usuario.setores.set(setores)
+
+            try:
+                matricula = Matricula.objects.create(
+                    user=usuario,
+                    matricula=matricula_data,
+                    validade=validade_matricula,
+                    expedicao=expedicao_matricula,
+                )
+            except IntegrityError as e:
+                raise serializers.ValidationError(
+                    {
+                        "matricula": f"Um usuário com esta matrícula ({matricula_data}) já foi registrado no sistema."
+                    }
+                )
+
+        return usuario
+
+    def validate_cpf(self, value):
+        if len(value) != 11 and not value.isnumeric():
+            raise serializers.ValidationError("O CPF deve conter 11 dígitos numéricos.")
+
+        return value
+
+    def validate_tel(self, value):
+        if len(value) != 11 and not value.isnumeric():
+            raise serializers.ValidationError(
+                "O telefone deve conter 11 dígitos numéricos."
+            )
+
+        return value
+
+    def validate_cnpj(self, value):
+        if len(value) != 14 and not value.isnumeric():
+            raise serializers.ValidationError(
+                "O CNPJ deve conter 14 dígitos numéricos."
+            )
+
+        return value
+
+
+class InserirVariosUsuariosCompletosSerializer(serializers.ListSerializer):
+    def create(self, validated_data_list):
+        users = []
+        with transaction.atomic():
+            for validated_data in validated_data_list:
+                user = InserirUsuarioCompletoSerializer().create(validated_data)
+                users.append(user)
+        return users
+
+
+class InserirVariosUsuariosCompletosWrapperSerializer(InserirUsuarioCompletoSerializer):
+    class Meta:
+        list_serializer_class = InserirVariosUsuariosCompletosSerializer
 
 
 class MatriculaSerializer(serializers.ModelSerializer):

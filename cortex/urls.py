@@ -26,20 +26,24 @@ from drf_spectacular.views import (
 from .view_jwt import TokenObtainPairViewDOC, TokenRefreshViewDOC, TokenVerifyViewDOC
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("api/token/", TokenObtainPairViewDOC.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh/", TokenRefreshViewDOC.as_view(), name="token_refresh"),
-    path("api/token/verify/", TokenVerifyViewDOC.as_view(), name="token_verify"),
-    path("api/gerusuarios/v1/", include("gerUsuarios.urls")),
-    path("api/soticon/v1/", include("soticon.urls")),
-    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("cortex/admin/", admin.site.urls),
     path(
-        "api/schema/swagger/",
+        "cortex/api/token/", TokenObtainPairViewDOC.as_view(), name="token_obtain_pair"
+    ),
+    path(
+        "cortex/api/token/refresh/", TokenRefreshViewDOC.as_view(), name="token_refresh"
+    ),
+    path("cortex/api/token/verify/", TokenVerifyViewDOC.as_view(), name="token_verify"),
+    path("cortex/api/gerusuarios/v1/", include("gerUsuarios.urls")),
+    path("cortex/api/soticon/v1/", include("soticon.urls")),
+    path("cortex/api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path(
+        "cortex/api/schema/swagger/",
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger",
     ),
     path(
-        "api/schema/redoc/",
+        "cortex/api/schema/redoc/",
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),

@@ -11,45 +11,53 @@ SPECTACULAR_SETTINGS = {
         },
         # Gerenciamento de Usuários
         {
-            "name": "GerenciamentoDeUsuários.Tipos",
+            "name": "Gerenciamento De Usuários.Tipos",
             "description": """Rotas relacionadas com os tipos de usuários.\n
-    Tipos padrões: "Admin", "TI", "Aluno", Motorista", "Professor", "Diretor.Geral", "Diretor.Ensino", "Coordenador", "Tec.Administrativo", "Serv.Terceirizado".""",
+    Tipos padrões: "Admin", "TI", "Aluno", "Motorista", "Professor", "Diretor.Geral", "Diretor.Ensino", "Coordenador", "Tec.Administrativo", "Serv.Terceirizado".""",
         },
         {
-            "name": "GerenciamentoDeUsuários.Enderecos",
+            "name": "Gerenciamento De Usuários.Enderecos",
             "description": "Rotas relacionadas com os endereços de usuários e empresas.\n",
         },
         {
-            "name": "GerenciamentoDeUsuários.Contatos",
+            "name": "Gerenciamento De Usuários.Contatos",
             "description": "Rotas relacionadas com os contatos de usuários e empresas.",
         },
         {
-            "name": "GerenciamentoDeUsuários.Empresas",
+            "name": "Gerenciamento De Usuários.Empresas",
             "description": "Rotas relacionadas com os dados de empresas.\nO IFPI é a única empresa padrão criada",
         },
         {
-            "name": "GerenciamentoDeUsuários.Usuários",
+            "name": "Gerenciamento De Usuários.Usuários",
             "description": "Rotas relacionadas com os usuários",
         },
         {
-            "name": "GerenciamentoDeUsuários.SolicitarResetSenha",
+            "name": "Gerenciamento De Usuários.Inserir Vários Alunos",
+            "description": "Rota para inserção de Alunos em Lote",
+        },
+        {
+            "name": "Gerenciamento De Usuários.Inserir Vários Usuários",
+            "description": "Rota para inserção de Alunos em Lote",
+        },
+        {
+            "name": "Gerenciamento De Usuários.Solicitar Reset de Senha",
             "description": "Rota responsável por enviar o email para o reset de senha do usuário",
         },
         {
-            "name": "GerenciamentoDeUsuários.ConfirmarCodigoResetSenha",
+            "name": "Gerenciamento De Usuários.Confirmar Codigo Reset de Senha",
             "description": "Rota responsável por cnfirmar o código de reset do usuário",
         },
         {
-            "name": "GerenciamentoDeUsuários.ConfirmarResetSenha",
+            "name": "Gerenciamento De Usuários.Confirmar Reset de Senha",
             "description": "Rota responsável por receber a nova senha do usuário",
         },
         {
-            "name": "GerenciamentoDeUsuários.Setores",
+            "name": "Gerenciamento De Usuários.Setores",
             "description": """Rotas relacionadas com os setores dos usuários.\n
-    Setores padrões: "Alunos", "Direcao Geral", "Direcao de Ensino", "Coordenacao Informatica", "Coordenacao Eletromecanica", "Coordenacao Edificacoes", "Coordenacao Meio Ambiente", "Coordenacao TADS", "Coordenacao Biologia", "Coordenacao Matematica", "Biblioteca", "Contabilidade", "Saude", "Multimeios", "CODIS", "Refeitorio", "Guarita".""",
+    Setores padrões: "Alunos", "Direcao Geral", "Direcao de Ensino", "Direcao de Administracao e Planejamento", "Coordenacao Informatica", "Coordenacao Eletromecanica", "Coordenacao Edificacoes", "Coordenacao Meio Ambiente", "Coordenacao TADS", "Coordenacao Biologia", "Coordenacao Matematica", "Coordenacao PROFMAT", "Coordenacao de Compras e Licitacao", "Coordenacao de Controle Academico", "Coordenacao de Disciplina", "Coordenacao de Ed. Fisica", "Coordenacao de Extensao", "Coordenacao de Multimidia", "Coordenacao de Patrimônio e Almoxarifado", "Coordenacao de Pesquisa e Inovacao", "TI", "Biblioteca", "Casa da Leitura", "Departamento Contabilidade", "Departamento Apoio ao Ensino", "Departamento Logistica, Manutencao e Compras", Enfermagem", "Engenharia", "Nutricao", "Psicologia", "Saude", "Servico Social", "Medico", "Odontologico", "Pedagogico", "Refeitorio", "Guarita", "Area Externa".""",
         },
         {
-            "name": "GerenciamentoDeUsuários.Matriculas",
+            "name": "Gerenciamento De Usuários.Matriculas",
             "description": "Rotas relacionadas com as matrículas de usuários",
         },
         # Soticon

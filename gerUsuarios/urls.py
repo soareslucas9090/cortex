@@ -28,4 +28,14 @@ urlpatterns = [
         PasswordResetConfirmAPIView.as_view(),
         name="confirm-password",
     ),
+    path(
+        "users/inserir_dados_completos/alunos/",
+        InserirVariosAlunosCompletosView.as_view(),
+        name="insert-multiple-students",
+    ),
+    path(
+        "users/inserir_dados_completos/usuarios/",
+        InserirVariosUsuariosCompletosView.as_view(),
+        name="insert-multiple-users",
+    ),
 ]

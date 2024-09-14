@@ -54,7 +54,7 @@ class Contato(Base):
     endereco = models.ForeignKey(
         Endereco, related_name="contato_endereco", on_delete=models.RESTRICT, null=False
     )
-    email = models.EmailField(max_length=60, null=False)
+    email = models.EmailField(max_length=60, null=True)
     tel = models.CharField(max_length=11, null=False)
 
     def __str__(self):

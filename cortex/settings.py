@@ -9,12 +9,16 @@ from .spectacular_settings import *
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv()
+
 # SECRET_KEY do Django, usada para criptografia
 SECRET_KEY = os.environ.get("secretKeyDjango")
+
 # Configura se o Django está em modo de DEBUG ou não
 DEBUG = os.environ.get("debugMode")
+
 # Indica todos os hosts autorizados a fazer requisições para o APP
-ALLOWED_HOSTS = [os.environ.get("allowedHosts")]
+ALLOWED_HOSTS = os.environ.get("allowedHosts", "").split(",")
+
 # Configura o banco de dados
 DATABASES = {
     "default": {
@@ -26,12 +30,15 @@ DATABASES = {
         "PORT": os.environ.get("bdPort"),
     }
 }
+
 # Armazena os endereços confiáveis para CSRF
 CSRF_TRUSTED_ORIGINS = os.environ.get(
     "csrfTrustedOriginsANDcorsOriginWhitelist", ""
 ).split(",")
+
 # Indica quais são os endereços internos
 INTERNAL_IPS = os.environ.get("internalIPs", "").split(",")
+
 # Armazena os endereços confiáveis para CORS
 CORS_ORIGIN_WHITELIST = os.environ.get(
     "csrfTrustedOriginsANDcorsOriginWhitelist", ""
@@ -40,6 +47,7 @@ CORS_ORIGIN_WHITELIST = os.environ.get(
 # Email padrão para o envio de emails do Django
 DEFAULT_FROM_EMAIL = os.environ.get("DefaultEmailForPasswordReset")
 EMAIL_HOST_USER = os.environ.get("DefaultEmailForPasswordReset")
+
 # Senha do Email. O Google exige que seja criado uma Senha de APP
 EMAIL_HOST_PASSWORD = os.environ.get("EmailPassword")
 
