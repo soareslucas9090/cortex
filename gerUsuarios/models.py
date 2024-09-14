@@ -52,7 +52,10 @@ class Endereco(Base):
 
 class Contato(Base):
     endereco = models.ForeignKey(
-        Endereco, related_name="contato_endereco", on_delete=models.RESTRICT, null=False
+        Endereco,
+        related_name="contato_associado",
+        on_delete=models.RESTRICT,
+        null=False,
     )
     email = models.EmailField(max_length=60, null=True)
     tel = models.CharField(max_length=11, null=False)
@@ -62,13 +65,14 @@ class Contato(Base):
         return str
 
     def save(self, *args, **kwargs):
-        self.email = self.email.lower()
+        if self.email:
+            self.email = self.email.lower()
         super().save(*args, **kwargs)
 
 
 class Empresa(Base):
     contato = models.ForeignKey(
-        Contato, related_name="empresa_contato", on_delete=models.RESTRICT, null=True
+        Contato, related_name="empresa_associada", on_delete=models.RESTRICT, null=True
     )
     nome = models.CharField(max_length=30, null=False, unique=True)
     cnpj = models.CharField(max_length=14, unique=True, null=False)
@@ -157,13 +161,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     nome = models.CharField(max_length=255, null=False)
     email = models.EmailField(unique=True, null=False)
     tipo = models.ForeignKey(
-        Tipo, related_name="user_tipo", on_delete=models.RESTRICT, null=False
+        Tipo, related_name="usuarios_tipo", on_delete=models.RESTRICT, null=False
     )
     contato = models.ForeignKey(
-        Contato, related_name="user_contato", on_delete=models.RESTRICT, null=True
+        Contato, related_name="usuario_contato", on_delete=models.RESTRICT, null=True
     )
     empresa = models.ForeignKey(
-        Empresa, related_name="user_empresa", on_delete=models.RESTRICT, null=True
+        Empresa, related_name="usuarios_empresa", on_delete=models.RESTRICT, null=True
     )
     cpf = models.CharField(max_length=11, null=False, unique=True)
     data_nascimento = models.DateField(null=True)
@@ -260,7 +264,7 @@ class Alteracao_User(models.Model):
 
 class Matricula(Base):
     user = models.ForeignKey(
-        User, related_name="matricula_user", on_delete=models.RESTRICT, null=False
+        User, related_name="matricula", on_delete=models.RESTRICT, null=False
     )
     matricula = models.CharField(max_length=19, null=False, unique=True)
     validade = models.DateField(null=True)

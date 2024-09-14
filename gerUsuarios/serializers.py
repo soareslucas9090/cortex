@@ -304,25 +304,26 @@ class InserirAlunoCompletoSerializer(serializers.Serializer):
     expedicao_matricula = serializers.DateField(required=True)
 
     def create(self, validated_data):
-
         # Usar atomic para garantir que todos os dados sejam inseridos juntos
         with transaction.atomic():
             try:
-                endereco_data = validated_data.pop("endereco")
+                endereco_data = validated_data.pop("endereco", None)
                 email_externo = validated_data.pop("email_externo", None)
-                tel = validated_data.pop("tel")
-                cpf = validated_data.pop("cpf")
-                nome = validated_data.pop("nome")
-                data_nascimento = validated_data.pop("data_nascimento")
-                matricula_data = validated_data.pop("matricula")
-                validade_matricula = validated_data.pop("validade_matricula")
-                expedicao_matricula = validated_data.pop("expedicao_matricula")
+                tel = validated_data.pop("tel", None)
+                cpf = validated_data.pop("cpf", None)
+                nome = validated_data.pop("nome", None)
+                data_nascimento = validated_data.pop("data_nascimento", None)
+                matricula_data = validated_data.pop("matricula", None)
+                validade_matricula = validated_data.pop("validade_matricula", None)
+                expedicao_matricula = validated_data.pop("expedicao_matricula", None)
             except Exception as e:
                 raise serializers.ValidationError({"error": e})
 
             endereco = Endereco.objects.create(**endereco_data)
             contato = Contato.objects.create(
-                endereco=endereco, email=email_externo, tel=tel
+                endereco=endereco,
+                email=email_externo,
+                tel=tel,
             )
 
             email_user = f"caflo.{matricula_data}@aluno.ifpi.edu.br"
