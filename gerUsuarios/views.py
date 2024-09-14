@@ -611,7 +611,7 @@ class InserirVariosAlunosCompletosView(GenericAPIView):
 class InserirVariosUsuariosCompletosView(GenericAPIView):
     serializer_class = InserirVariosUsuariosCompletosWrapperSerializer
     http_method_names = ["post"]
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminOrTI]
 
     @extend_schema(
         examples=[
