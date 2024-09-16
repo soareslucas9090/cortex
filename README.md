@@ -17,7 +17,8 @@ As APIs seguem o padrão REST, mas não implementam todas as recomendações par
 -   Segurança e gerenciamento para diferentes tipos de usuários
 -   Personalização de views de acordo com permissões de usuário
 -   Segurança baseada em tokens jwt (access e refresh tokens)
--   Documentação Swagger Completa 
+-   Documentação Swagger Completa
+-   Menu Admin mais completo e de fácil uso
 ### Futuros incrementos
 - Gerenciamento de permissões completo (com definição de permissão de alteração, criação, deleção e visualização para cada tipo de usuário e cada tabela do banco)
 - Suporte a Logs de alterações de dados
