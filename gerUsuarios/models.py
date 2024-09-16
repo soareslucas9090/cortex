@@ -8,6 +8,8 @@ from django.contrib.auth.models import (
 from django.db import models
 from django.utils import timezone
 
+preposicoes = ["da", "de", "do"]
+
 
 class Base(models.Model):
     is_ativo = models.BooleanField(default=True, null=False)
@@ -61,7 +63,10 @@ class Contato(Base):
     tel = models.CharField(max_length=11, null=False)
 
     def __str__(self):
-        str = f"{self.email}"
+        try:
+            str = f"Contato de {self.usuario_contato}"
+        except:
+            str = f"Contato sem usuário: {self.tel}"
         return str
 
     def save(self, *args, **kwargs):
@@ -163,7 +168,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     tipo = models.ForeignKey(
         Tipo, related_name="usuarios_tipo", on_delete=models.RESTRICT, null=False
     )
-    contato = models.ForeignKey(
+    contato = models.OneToOneField(
         Contato, related_name="usuario_contato", on_delete=models.RESTRICT, null=True
     )
     empresa = models.ForeignKey(
@@ -195,7 +200,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.nome
 
     def save(self, *args, **kwargs):
-        self.nome = self.nome.lower()
+        nome_capitalizado = []
+        for nome in self.nome.split():
+            if not nome in preposicoes:
+                nome = nome.capitalize()
+            nome_capitalizado.append(nome)
+
+        novo_nome = " ".join(nome_capitalizado)
+        self.nome = novo_nome
         super().save(*args, **kwargs)
 
     class Meta:
@@ -245,7 +257,7 @@ class Setor_User(Base):
     )
 
     def __str__(self):
-        str = f"Setor: {self.setor} e Usuario: {self.usuario}"
+        str = f"Setor: {self.setor} e Usuario: {self.user}"
         return str
 
 

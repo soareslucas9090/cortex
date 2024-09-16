@@ -34,7 +34,7 @@ class TipoViewSet(ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
-    http_method_names = ["get", "head", "patch", "post"]
+    http_method_names = ["get"]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -74,7 +74,7 @@ class EnderecoViewSet(ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
-    http_method_names = ["get", "head", "patch", "delete", "post"]
+    http_method_names = ["get", "head", "patch"]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -98,7 +98,7 @@ class ContatoViewSet(ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
-    http_method_names = ["get", "head", "patch", "delete", "post"]
+    http_method_names = ["get", "head", "patch"]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -153,7 +153,7 @@ class EmpresaViewSet(ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
-    http_method_names = ["get", "head", "patch", "delete", "post"]
+    http_method_names = ["get"]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -208,7 +208,7 @@ class UserViewSet(ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
-    http_method_names = ["get", "head", "patch", "delete", "post"]
+    http_method_names = ["get"]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -676,7 +676,7 @@ class SetorViewSet(ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
-    http_method_names = ["get", "head", "patch", "post"]
+    http_method_names = ["get"]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -709,21 +709,6 @@ class SetorViewSet(ModelViewSet):
         return super().get_permissions()
 
 
-class SetorUserViewSet(ModelViewSet):
-    queryset = Setor_User.objects.all()
-    serializer_class = Setor_UserSerializer
-    permission_classes = [
-        IsAuthenticated,
-    ]
-    http_method_names = ["get", "head", "patch", "delete", "post"]
-
-    def get_permissions(self):
-        if self.request.method in ["POST", "PATCH", "DELETE"]:
-            return [IsAdminOrTI()]
-
-        return super().get_permissions()
-
-
 @extend_schema(tags=["Gerenciamento De Usuários.Matriculas"])
 class MatriculaViewSet(ModelViewSet):
     queryset = Matricula.objects.all()
@@ -731,7 +716,7 @@ class MatriculaViewSet(ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
-    http_method_names = ["get", "head", "patch", "delete", "post"]
+    http_method_names = ["get"]
 
     def get_queryset(self):
         queryset = super().get_queryset()

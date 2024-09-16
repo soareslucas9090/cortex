@@ -23,10 +23,14 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
+# Importação feita para utilizar classe customizada que permite apenas superusuários
+# terem acesso ao Painel Admin
+from gerUsuarios.admin import admin_custom_site
+
 from .view_jwt import TokenObtainPairViewDOC, TokenRefreshViewDOC, TokenVerifyViewDOC
 
 urlpatterns = [
-    path("cortex/admin/", admin.site.urls),
+    path("cortex/admin/", admin_custom_site.urls),
     path(
         "cortex/api/token/", TokenObtainPairViewDOC.as_view(), name="token_obtain_pair"
     ),
