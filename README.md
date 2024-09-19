@@ -1,4 +1,5 @@
 
+
 # Cortex & SOTICON API
 
 <img align="center" alt="Python" width="30" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg"><span>&nbsp;&nbsp;&nbsp;</span>
@@ -181,6 +182,9 @@ http {
 
 Para a inserção em lote de Usuários é necessário rodar o script `inserir_alunos.py` ou `inserir_usuarios.py` presente em `./insert_users/` enquanto o servidor está ativo, pois a inserção é feita com os endpoints da API. 
 Antes da execução, abra o script e edite as variáveis `CPF` e `PASSWORD` com os valores reais de um usuário com permissão de inserção.
+
+### ***O email institucional do aluno é obtido por meio da concatenação da sua matrícula na string "caflo.MATRICULA_DO_ALUNO@aluno.ifpi.edu.br". Isto pode ser editado no arquivo `./gerUsuarios/serializers.py`, na função "InserirAlunoCompletoSerializer", o nome da variável que recebe esta concatenação é `email_user`.***
+
 Para a inserção de alunos é necessário um arquivo Excel, com o nome e extenção `alunos.xlsx`, seguindo a seguinte estrutura à risca, inclusive as letras maiúsculas, minúsculas e acentos:
 
 |CPF|Matrícula|Nome|Ano Letivo de Previsão de Conclusão|Bairro|Cidade|Data de Matrícula|Data de Nascimento|Endereço|Telefone|
