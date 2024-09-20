@@ -50,7 +50,7 @@ Abaixo um print da área de login da API com JWT, é necessário consummir a rot
 
 Foram implementados filtros de pesquisa (query-params) na maioria das rotas para aplicação de filtros de pesquisas.
 
-A documentação está na rota `/api/schema/swagger/`
+A documentação está na rota `cortex/api/schema/swagger/`
 
 # Rodando o projeto
 
