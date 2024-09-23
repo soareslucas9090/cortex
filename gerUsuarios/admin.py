@@ -1,8 +1,6 @@
 from typing import Any
 
 from django.contrib import admin
-from django.contrib.auth.models import Group
-from django.http import HttpRequest
 
 from .forms import *
 from .models import *

@@ -18,17 +18,19 @@ class AdminPortalUserForm(forms.ModelForm):
         ):
             user.set_password(self.cleaned_data["password"])
 
-        if user.is_superuser:
-            user.is_admin = True
-            user.is_staff = True
-            permissions = Permission.objects.all()
-            user.user_permissions.set(permissions)
-
-        else:
-            user.is_staff = False
-            none_permissions = Permission.objects.none()
-            user.user_permissions.set(none_permissions)
-
         if commit:
             user.save()
+
+            if user.is_superuser:
+                user.is_admin = True
+                user.is_staff = True
+                permissions = Permission.objects.all()
+                user.user_permissions.set(permissions)
+            else:
+                user.is_staff = False
+                none_permissions = Permission.objects.none()
+                user.user_permissions.set(none_permissions)
+
+            user.save()
+
         return user
