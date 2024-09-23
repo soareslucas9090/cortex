@@ -401,13 +401,20 @@ class ReservarTickets(GenericViewSet, CreateModelMixin):
                         except:
                             posicaofilaMax = 1
 
-                        Tickets.objects.create(
-                            usado=False,
-                            reservado=True,
-                            posicao_fila=PosicaoFila.objects.get(pk=posicaofilaMax),
-                            rota=rota,
-                            user_soticon=user_soticon,
-                        )
+                        while True:
+                            try:
+                                Tickets.objects.create(
+                                    usado=False,
+                                    reservado=True,
+                                    posicao_fila=PosicaoFila.objects.get(
+                                        pk=posicaofilaMax
+                                    ),
+                                    rota=rota,
+                                    user_soticon=user_soticon,
+                                )
+                                break
+                            except:
+                                posicaofilaMax += 1
 
                         serializer_data["posicao_fila"] = posicaofilaMax
 

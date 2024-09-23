@@ -96,6 +96,12 @@ class Tickets(models.Model):
     class Meta:
         ordering = ["rota"]
 
+        constraints = [
+            models.UniqueConstraint(
+                fields=["rota", "posicao_fila"], name="unique_rota_posicao_constraint"
+            )
+        ]
+
 
 class Regras(modelsUsusarios.Base):
     descricao = models.CharField(max_length=512, null=False)
