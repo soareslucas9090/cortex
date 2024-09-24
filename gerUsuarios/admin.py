@@ -61,6 +61,7 @@ class UserAdmin(admin.ModelAdmin):
 
     list_display = (
         "cpf",
+        "id",
         "nome",
         "email",
         "tipo",
@@ -126,7 +127,7 @@ class EnderecoAdmin(admin.ModelAdmin):
 
 
 class TipoAdmin(admin.ModelAdmin):
-    list_display = ("nome", "is_ativo")
+    list_display = ("id", "nome", "is_ativo")
     search_fields = ("nome",)
     list_filter = ("is_ativo",)
     ordering = ("nome",)
@@ -137,20 +138,23 @@ class ContatoAdmin(admin.ModelAdmin):
 
 
 class EmpresaAdmin(admin.ModelAdmin):
-    search_fields = ("nome",)
+    search_fields = (
+        "id",
+        "nome",
+    )
     list_filter = ("is_ativo",)
     ordering = ("nome",)
 
 
 class SetorAdmin(admin.ModelAdmin):
-    list_display = ("nome", "is_ativo")
+    list_display = ("id", "nome", "is_ativo")
     search_fields = ("nome",)
     list_filter = ("is_ativo",)
     ordering = ("nome",)
 
 
 class MatriculaAdmin(admin.ModelAdmin):
-    list_display = ("matricula", "user", "is_ativo")
+    list_display = ("id", "matricula", "user", "is_ativo")
     search_fields = ("matricula", "user__nome")
     list_filter = ("is_ativo", "user")
     ordering = ("matricula",)

@@ -34,15 +34,18 @@ class UserSoticonViewSet(ModelViewSet):
         return self.listarTicketsDoUsuario(instance)
 
     def list(self, request, *args, **kwargs):
-        usuario = self.request.query_params.get("usuario", None)
-        if usuario:
-            queryset = super().get_queryset()
-            queryset = queryset.get(usuario=usuario)
-            print(queryset)
-            return self.listarTicketsDoUsuario(queryset)
+        try:
+            usuario = self.request.query_params.get("usuario", None)
+            if usuario:
+                queryset = super().get_queryset()
+                queryset = queryset.get(usuario__id=usuario)
+                return self.listarTicketsDoUsuario(queryset)
 
-        else:
-            return super().list(request, *args, **kwargs)
+            else:
+                return super().list(request, *args, **kwargs)
+
+        except Exception as e:
+            print(e)
 
     def listarTicketsDoUsuario(self, instance):
         serializer = self.get_serializer(instance)
@@ -50,9 +53,9 @@ class UserSoticonViewSet(ModelViewSet):
 
         data_atual = date.today()
         ticket_reservado = Tickets.objects.filter(
-            Q(user_soticon=instance, reservado=True, usado=False)
-            & Q(rota__data=data_atual)
+            user_soticon=instance, reservado=True, usado=False, rota__data=data_atual
         )
+
         if ticket_reservado:
             serializer_data = serializer.data
             tickets_reservado = []
