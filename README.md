@@ -78,6 +78,8 @@ Colocar o arquivo `.env` na raiz do projeto ou adicionar estas variáveis direta
 
 Faça a criação do banco de dados com o comando `python manage.py migrate`.
 
+### O comando `python manage.py migrate` é muito importante de ser feito toda vez que se atualiza o sistema, ele é quem cria um usuário do SOTICON para cada aluno cadastrado no Cortex, por exemplo.
+
 Depois de criar o banco, acesse ele por algum cliente, como o DBeaver, e crie a função do arquivo `atualizar_rotas.sql` localizado na pasta `/forBD/`. Este código é necessário para o fechamento automático de rotas. Após isso:
 - Caso seu sistema seja Linux, siga o tutorial para a criação da schedule presente no arquivo `Schedule atualizar rotas.txt` (na mesma pasta que o arquivo sql), sendo necessário a instalação do `pg_cron`.
 - Caso se sistema seja Windows, siga as etapas descritas no arquivo `Schedule atualizar rotas.txt`, que irá criar uma Tarefa Agendada para executar um comando SQL que rodará a função `atualizar_rotas();` a cada 20 minutos. Um detalhe importante para este caso é que o arquivo `exec_atualizar_rotas.bat` precisa ser editado com as as credenciais e nome de banco corretos para pleno funcionamento, sendo possível fazer referência a uma variável de ambiente no sistema com `%nome_da_variavel%`.
