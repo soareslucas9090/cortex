@@ -1,40 +1,14 @@
 from django.contrib import admin
 
+from gerUsuarios.admin import admin_custom_site
+
 from .models import *
 
 
 class UserSoticonAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("id", "usuario", "faltas")
+    search_fields = ("usuario",)
+    ordering = ("usuario",)
 
 
-class StrikeAdmin(admin.ModelAdmin):
-    pass
-
-
-class JustificativaAdmin(admin.ModelAdmin):
-    pass
-
-
-class PosicaoFilaAdmin(admin.ModelAdmin):
-    pass
-
-
-class RotaAdmin(admin.ModelAdmin):
-    pass
-
-
-class TicketsAdmin(admin.ModelAdmin):
-    pass
-
-
-class RegrasAdmin(admin.ModelAdmin):
-    pass
-
-
-admin.site.register(UserSoticon, UserSoticonAdmin)
-admin.site.register(Strike, StrikeAdmin)
-admin.site.register(Justificativa, JustificativaAdmin)
-admin.site.register(PosicaoFila, PosicaoFilaAdmin)
-admin.site.register(Rota, RotaAdmin)
-admin.site.register(Tickets, TicketsAdmin)
-admin.site.register(Regras, RegrasAdmin)
+admin_custom_site.register(UserSoticon, UserSoticonAdmin)
