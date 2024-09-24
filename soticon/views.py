@@ -16,6 +16,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
+from gerUsuarios.permissions import IsAdminOrTI
+
 from .models import *
 from .serializers import *
 
@@ -30,19 +32,26 @@ class UserSoticonViewSet(ModelViewSet):
     http_method_names = ["get", "head", "patch", "delete", "post"]
 
     def retrieve(self, request, *args, **kwargs):
+        user_soticon = UserSoticon.objects.get(usuario=request.user.id)
+
+        if int(kwargs.get("pk")) != user_soticon.id:
+            if not IsAdminOrTI().has_permission(self.request, self):
+                return Response(
+                    {"Usuário sem permição de visualização destes dados."},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+
         instance = self.get_object()
         return self.listarTicketsDoUsuario(instance)
 
     def list(self, request, *args, **kwargs):
         try:
-            usuario = self.request.query_params.get("usuario", None)
-            if usuario:
-                queryset = super().get_queryset()
-                queryset = queryset.get(usuario__id=usuario)
+            queryset = super().get_queryset()
+            if not IsAdminOrTI().has_permission(self.request, self):
+                queryset = queryset.get(usuario=self.request.user)
                 return self.listarTicketsDoUsuario(queryset)
 
-            else:
-                return super().list(request, *args, **kwargs)
+            return super().list(request, *args, **kwargs)
 
         except Exception as e:
             print(e)
