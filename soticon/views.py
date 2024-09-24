@@ -19,6 +19,7 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from gerUsuarios.permissions import IsAdminOrTI
 
 from .models import *
+from .permissions import IsSectorAuthorized
 from .serializers import *
 
 
@@ -90,6 +91,12 @@ class UserSoticonViewSet(ModelViewSet):
         else:
             return Response(serializer.data)
 
+    def get_permissions(self):
+        if self.request.method in ["PATCH", "DELETE", "POST"]:
+            return [IsAdminOrTI()]
+
+        return super().get_permissions()
+
 
 @extend_schema(tags=["Soticon.Strikes"])
 class StrikeViewSet(ModelViewSet):
@@ -124,6 +131,12 @@ class StrikeViewSet(ModelViewSet):
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
+
+    def get_permissions(self):
+        if self.request.method in ["PATCH", "DELETE", "POST"]:
+            return [IsAdminOrTI()]
+
+        return super().get_permissions()
 
 
 @extend_schema(tags=["Soticon.Justificativas"])
@@ -261,6 +274,13 @@ class RotaViewSet(ModelViewSet):
 
         return Response(serializer.data)
 
+    def get_permissions(self):
+        if self.request.method in ["PATCH", "DELETE", "POST"]:
+            print("aqui")
+            return [IsSectorAuthorized()]
+
+        return super().get_permissions()
+
 
 @extend_schema(tags=["Soticon.Tickets"])
 class TicketsViewSet(ModelViewSet):
@@ -269,12 +289,10 @@ class TicketsViewSet(ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
-    http_method_names = ["get", "head", "patch", "delete", "post"]
+    http_method_names = ["get", "head", "patch"]
 
     def get_queryset(self):
         queryset = super().get_queryset()
-
-        user = self.queryset.filter()
 
         rota = self.request.query_params.get("rota", None)
 
