@@ -79,6 +79,20 @@ class TicketsSerializer(serializers.ModelSerializer):
     )
 
 
+class VerificarTicketsEDeclararFaltanteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tickets
+        fields = [
+            "rota",
+            "user_soticon",
+        ]
+
+    rota = serializers.PrimaryKeyRelatedField(queryset=Rota.objects.all())
+    user_soticon = serializers.PrimaryKeyRelatedField(
+        queryset=UserSoticon.objects.select_related("usuario").all()
+    )
+
+
 class TicketsDetalhadosSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tickets

@@ -10,10 +10,11 @@ class SoticonConfig(AppConfig):
     def ready(self):
         from gerUsuarios.models import User
 
-        from .models import PosicaoFila, UserSoticon
+        from .models import PosicaoFila, Regras, UserSoticon
 
         post_migrate.connect(create_default_posicoes_fila, sender=self)
         post_migrate.connect(create_default_users_soticon, sender=self)
+        post_migrate.connect(create_default_regras_soticon, sender=self)
 
 
 def create_default_posicoes_fila(sender, **kwargs):
@@ -41,3 +42,19 @@ def create_default_users_soticon(sender, **kwargs):
         except OperationalError:
             print("Não foi possível realizar migrate dos usuários Soticon")
             pass
+
+
+def create_default_regras_soticon(sender, **kwargs):
+    Regras = sender.get_model("Regras")
+
+    try:
+        try:
+            regra = Regras.objects.get(descricao="num_vagas_onibus")
+            regra.parametro = 84
+            regra.save()
+        except:
+            Regras.objects.create(descricao="num_vagas_onibus", parametro=84)
+
+    except OperationalError:
+        print("Não foi possível realizar migrate das regras do Soticon")
+        pass

@@ -88,6 +88,7 @@ class Tickets(models.Model):
         on_delete=models.RESTRICT,
         null=False,
     )
+    faltante = models.BooleanField(default=False, null=False)
 
     def __str__(self):
         str = f"Rota: {self.rota}, userSoticon: {self.user_soticon}"
@@ -104,5 +105,5 @@ class Tickets(models.Model):
 
 
 class Regras(modelsUsusarios.Base):
-    descricao = models.CharField(max_length=512, null=False)
+    descricao = models.CharField(max_length=512, null=False, unique=True)
     parametro = models.IntegerField(null=False)

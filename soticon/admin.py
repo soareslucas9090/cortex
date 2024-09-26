@@ -11,4 +11,11 @@ class UserSoticonAdmin(admin.ModelAdmin):
     ordering = ("usuario",)
 
 
+class RegrasSoticonAdmin(admin.ModelAdmin):
+    list_display = ("descricao", "parametro")
+    search_fields = ("descricao",)
+    ordering = ("descricao",)
+
+
 admin_custom_site.register(UserSoticon, UserSoticonAdmin)
+admin_custom_site.register(Regras, RegrasSoticonAdmin)

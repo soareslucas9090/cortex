@@ -98,6 +98,10 @@ SPECTACULAR_SETTINGS = {
             "description": "Rota responsável por verificar os tickets.",
         },
         {
+            "name": "Soticon.Declarar Aluno Faltante",
+            "description": "Rota responsável por declarar aluno como faltante na fila do ônibus.",
+        },
+        {
             "name": "Soticon.Finalizar Rota",
             "description": "Rota responsável por finalizar uma rota.",
         },
