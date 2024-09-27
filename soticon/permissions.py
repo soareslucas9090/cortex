@@ -37,8 +37,6 @@ class IsAuthorizedToOperateRoutes(permissions.BasePermission):
             "motorista",
             "diretor.geral",
             "diretor.ensino",
-            "motorista",
-            "motorista",
         ]
         if request.user.tipo.nome.lower() in tiposAutorizados:
             return True
