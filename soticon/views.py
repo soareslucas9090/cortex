@@ -1,7 +1,5 @@
 from datetime import date, datetime, timedelta
 
-from django.db.models import Q
-from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import (
     OpenApiExample,
     OpenApiParameter,
@@ -11,7 +9,6 @@ from drf_spectacular.utils import (
 )
 from rest_framework import status
 from rest_framework.mixins import CreateModelMixin
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
@@ -19,7 +16,11 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from gerUsuarios.permissions import IsAdminOrTI
 
 from .models import *
-from .permissions import IsSectorAuthorized
+from .permissions import (
+    IsAuthorizedToOperateRoutes,
+    IsSectorAuthorizedToChangeRoutes,
+    IsStudent,
+)
 from .serializers import *
 
 
@@ -30,7 +31,7 @@ class UserSoticonViewSet(ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
-    http_method_names = ["get", "head", "patch", "delete", "post"]
+    http_method_names = ["get", "head"]
 
     def retrieve(self, request, *args, **kwargs):
         user_soticon = UserSoticon.objects.get(usuario=request.user.id)
@@ -276,8 +277,7 @@ class RotaViewSet(ModelViewSet):
 
     def get_permissions(self):
         if self.request.method in ["PATCH", "DELETE", "POST"]:
-            print("aqui")
-            return [IsSectorAuthorized()]
+            return [IsSectorAuthorizedToChangeRoutes()]
 
         return super().get_permissions()
 
@@ -333,10 +333,13 @@ class TicketsViewSet(ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
-    http_method_names = ["get", "head", "patch"]
+    http_method_names = ["get", "head"]
 
     def get_queryset(self):
         queryset = super().get_queryset()
+
+        if IsStudent().has_permission(self.request, self):
+            return queryset.filter(id=0)
 
         rota = self.request.query_params.get("rota", None)
 
@@ -346,7 +349,21 @@ class TicketsViewSet(ModelViewSet):
 
         rota_valida = self.request.query_params.get("rota_valida", None)
 
-        if rota_valida and rota_valida.isnumeric():
+        faltantes = self.request.query_params.get("faltantes", None)
+
+        if faltantes:
+            if faltantes.lower() == "false":
+                faltantes = False
+
+            elif faltantes.lower() == "true":
+                faltantes = True
+
+        if rota_valida and rota_valida.isnumeric() and faltantes:
+
+            queryset = queryset.filter(rota=rota_valida, reservado=True, faltantes=True)
+            return queryset
+
+        elif rota_valida and rota_valida.isnumeric():
             queryset = queryset.filter(rota=rota_valida, reservado=True)
             return queryset
 
@@ -379,6 +396,13 @@ class TicketsViewSet(ModelViewSet):
                 location=OpenApiParameter.QUERY,
             ),
             OpenApiParameter(
+                name="faltantes",
+                type=OpenApiTypes.BOOL,
+                description="Filtra os tickets de usuários faltantes para uma rota válida (use junto com rota_valida)",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
                 name="usuario",
                 type=OpenApiTypes.INT,
                 description="Filtra todos os tickets de determinado usuário que não foram usados para a data de hoje",
@@ -404,7 +428,7 @@ class ReservarTickets(GenericViewSet, CreateModelMixin):
     queryset = Tickets.objects.all()
     serializer_class = ReservarTicketSerializer
     permission_classes = [
-        IsAuthenticated,
+        IsStudent,
     ]
     http_method_names = ["post"]
 
@@ -510,13 +534,20 @@ class ReservarTickets(GenericViewSet, CreateModelMixin):
     tags=["Soticon.Verificar Tickets"],
     examples=[
         OpenApiExample(
-            "Exemplo de Erro por posição errada.",
+            "Exemplo requisição correta.",
+            value={
+                "user_soticon": 9,
+                "rota": 220,
+            },
+        ),
+        OpenApiExample(
+            "Exemplo de retorno com erro por posição errada.",
             value={
                 "error": "A posição do ticket que está sendo verificado não corresponde a esperada",
                 "posicao_esperada": 9,
                 "posicao_passada": 11,
             },
-        )
+        ),
     ],
     responses={
         status.HTTP_200_OK: OpenApiResponse(description="Ticket Verificado"),
@@ -535,7 +566,7 @@ class VerificarTickets(ModelViewSet):
     queryset = Tickets.objects.all()
     serializer_class = VerificarTicketsEDeclararFaltanteSerializer
     http_method_names = ["put"]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthorizedToOperateRoutes]
 
     def get_object(self, request):
         if "user_soticon" and "rota" in request.data:
@@ -610,6 +641,86 @@ class VerificarTickets(ModelViewSet):
 
 
 @extend_schema(
+    tags=["Soticon.Verificar Tickets"],
+    examples=[
+        OpenApiExample(
+            "Exemplo requisição correta.",
+            value={
+                "user_soticon": 9,
+                "rota": 220,
+            },
+        )
+    ],
+    responses={
+        status.HTTP_200_OK: OpenApiResponse(description="Ticket Verificado"),
+        status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+            description="O usuário não é faltante/O usuário já usou o ticket"
+        ),
+        status.HTTP_404_NOT_FOUND: OpenApiResponse(
+            description="Usuário não localizado/Usuário não possui reserva/Rota não localizada."
+        ),
+        status.HTTP_500_INTERNAL_SERVER_ERROR: OpenApiResponse(
+            description="Erro interno."
+        ),
+    },
+)
+class VerificarTicketsFaltantes(ModelViewSet):
+    queryset = Tickets.objects.all()
+    serializer_class = VerificarTicketsEDeclararFaltanteSerializer
+    http_method_names = ["put"]
+    permission_classes = [IsAuthorizedToOperateRoutes]
+
+    def get_object(self, request):
+        if "user_soticon" and "rota" in request.data:
+            try:
+                user_soticon = request.data.get("user_soticon")
+                rota_id = request.data.get("rota")
+                try:
+
+                    UserSoticon.objects.get(pk=user_soticon)
+                    Rota.objects.get(pk=rota_id)
+
+                    reserva = Tickets.objects.filter(
+                        user_soticon=user_soticon, rota=rota_id, reservado=True
+                    ).first()
+
+                    return reserva
+
+                except UserSoticon.DoesNotExist:
+                    return Response({"error": "Usuário não localizado!"}, status=404)
+
+                except Rota.DoesNotExist:
+                    return Response({"error": "Rota não localizada!"}, status=404)
+
+            except Exception as e:
+                print(e)
+                return Response(
+                    {"error": "Erro ao realizar consulta de dados."}, status=500
+                )
+
+    def put(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object(request)
+        if instance is None:
+            return Response({"error": "Usuário não possui reserva!"}, status=404)
+
+        if instance.usado:
+            return Response({"error": "Usuário já usou o ticket."}, status=400)
+
+        if not instance.faltante:
+            return Response({"error": "O usuário não é faltante."}, status=400)
+
+        serializer = self.get_serializer(
+            instance, data={"usado": True, "faltante": False}, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+
+
+@extend_schema(
     tags=["Soticon.Declarar Aluno Faltante"],
     responses={
         status.HTTP_200_OK: OpenApiResponse(description="Ticket Verificado"),
@@ -628,7 +739,7 @@ class DeclararAlunoFaltante(ModelViewSet):
     queryset = Tickets.objects.all()
     serializer_class = VerificarTicketsEDeclararFaltanteSerializer
     http_method_names = ["put"]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthorizedToOperateRoutes]
 
     def get_object(self, request):
         if "user_soticon" and "rota" in request.data:
@@ -683,7 +794,7 @@ class FinalizarRota(ModelViewSet):
     queryset = Rota.objects.all()
     serializer_class = FinalizarRotaSerializer
     permission_classes = [
-        IsAuthenticated,
+        IsAuthorizedToOperateRoutes,
     ]
     http_method_names = ["put"]
 

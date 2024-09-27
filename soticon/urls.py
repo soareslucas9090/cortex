@@ -5,15 +5,17 @@ from .views import *
 
 soticon_router = SimpleRouter()
 soticon_router.register("users", UserSoticonViewSet)
-soticon_router.register("strikes", StrikeViewSet)
-soticon_router.register("justificativas", JustificativaViewSet)
-soticon_router.register("posicoes", PosicaoFilaViewSet)
 soticon_router.register("rotas", RotaViewSet)
 soticon_router.register("tickets", TicketsViewSet)
 soticon_router.register("regras", RegrasViewSet)
 soticon_router.register("reservar_ticket", ReservarTickets, basename="reservar_ticket")
 soticon_router.register(
     "verificar_tickets", VerificarTickets, basename="verificar_tickets"
+)
+soticon_router.register(
+    "verificar_tickets_faltantes",
+    VerificarTicketsFaltantes,
+    basename="verificar_tickets_faltantes",
 )
 soticon_router.register(
     "aluno_faltante", DeclararAlunoFaltante, basename="aluno_faltante"
