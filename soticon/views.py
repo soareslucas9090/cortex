@@ -292,7 +292,41 @@ class RegrasViewSet(ModelViewSet):
     http_method_names = ["get"]
 
 
-@extend_schema(tags=["Soticon.Tickets"])
+@extend_schema(
+    tags=["Soticon.Tickets"],
+    responses={
+        status.HTTP_200_OK: OpenApiResponse(
+            examples=[
+                OpenApiExample(
+                    'Exemplo de Resposta Detalhada com query parameter "rota_valida" ou "usuario"',
+                    value={
+                        "id": 1,
+                        "nome": "João da Silva",
+                        "cpf": "12345678900",
+                        "rota": 123,
+                        "user_soticon": 456,
+                        "posicao_fila": 5,
+                        "usado": False,
+                        "reservado": True,
+                        "faltante": False,
+                    },
+                ),
+                OpenApiExample(
+                    "Exemplo de Resposta padrão",
+                    value={
+                        "id": 1,
+                        "rota": 123,
+                        "user_soticon": 456,
+                        "posicao_fila": 5,
+                        "usado": False,
+                        "reservado": True,
+                        "faltante": False,
+                    },
+                ),
+            ]
+        ),
+    },
+)
 class TicketsViewSet(ModelViewSet):
     queryset = Tickets.objects.select_related("user_soticon__usuario").all()
     serializer_class = TicketsSerializer
