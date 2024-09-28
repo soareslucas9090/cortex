@@ -364,9 +364,7 @@ class TicketsViewSet(ModelViewSet):
             return queryset
 
         elif rota_valida and rota_valida.isnumeric():
-            queryset = queryset.filter(
-                rota=rota_valida, reservado=True, faltantes=False
-            )
+            queryset = queryset.filter(rota=rota_valida, reservado=True, faltante=False)
             return queryset
 
         usuario = self.request.query_params.get("usuario", None)
