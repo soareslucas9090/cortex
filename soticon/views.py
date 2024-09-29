@@ -359,9 +359,13 @@ class TicketsViewSet(ModelViewSet):
                 faltantes = True
 
         if rota_valida and rota_valida.isnumeric() and faltantes:
-
-            queryset = queryset.filter(rota=rota_valida, reservado=True, faltantes=True)
-            return queryset
+            try:
+                queryset = queryset.filter(
+                    rota=rota_valida, reservado=True, faltante=True
+                )
+                return queryset
+            except Exception as e:
+                print(e)
 
         elif rota_valida and rota_valida.isnumeric():
             queryset = queryset.filter(rota=rota_valida, reservado=True, faltante=False)
@@ -532,31 +536,12 @@ class ReservarTickets(GenericViewSet, CreateModelMixin):
 
 @extend_schema(
     tags=["Soticon.Verificar Tickets"],
-    examples=[
-        OpenApiExample(
-            "Exemplo requisição correta.",
-            value={
-                "user_soticon": 9,
-                "rota": 220,
-            },
-        ),
-        OpenApiExample(
-            "Exemplo de retorno com erro por posição errada.",
-            value={
-                "error": "A posição do ticket que está sendo verificado não corresponde a esperada",
-                "posicao_esperada": 9,
-                "posicao_passada": 11,
-            },
-        ),
-    ],
     responses={
         status.HTTP_200_OK: OpenApiResponse(description="Ticket Verificado"),
         status.HTTP_400_BAD_REQUEST: OpenApiResponse(
             description="A posição do ticket que está sendo verificado não corresponde a esperada/O usuário já usou o ticket"
         ),
-        status.HTTP_404_NOT_FOUND: OpenApiResponse(
-            description="Usuário não localizado/Usuário não possui reserva/Rota não localizada."
-        ),
+        status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Ticket não localizado"),
         status.HTTP_500_INTERNAL_SERVER_ERROR: OpenApiResponse(
             description="Erro interno."
         ),
@@ -564,80 +549,109 @@ class ReservarTickets(GenericViewSet, CreateModelMixin):
 )
 class VerificarTickets(ModelViewSet):
     queryset = Tickets.objects.all()
-    serializer_class = VerificarTicketsEDeclararFaltanteSerializer
     http_method_names = ["put"]
     permission_classes = [IsAuthorizedToOperateRoutes]
 
-    def get_object(self, request):
-        if "user_soticon" and "rota" in request.data:
+    def ticket_verificado(self, ticket):
+        ticket.usado = True
+        ticket.faltante = False
+        ticket.save()
+
+        return Response(
+            {"message": "Ticket verificado com sucesso!"},
+            status=status.HTTP_200_OK,
+        )
+
+    def update(self, request, *args, **kwargs):
+        try:
+            ticket = Tickets.objects.get(pk=kwargs["pk"])
+
+            if not ticket.reservado:
+                return Response(
+                    {"error": "Usuário não possui reserva!"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            if ticket.usado:
+                return Response(
+                    {"error": "Usuário já usou o ticket."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
             try:
-                user_soticon = request.data.get("user_soticon")
-                rota_id = request.data.get("rota")
-                try:
 
-                    UserSoticon.objects.get(pk=user_soticon)
-                    Rota.objects.get(pk=rota_id)
+                if ticket.posicao_fila.num_ticket == 1:
+                    return self.ticket_verificado(ticket)
 
-                    reserva = Tickets.objects.filter(
-                        user_soticon=user_soticon,
-                        rota=rota_id,
-                        reservado=True,
-                    ).first()
+                algum_aluno_passou = Tickets.objects.filter(
+                    rota=ticket.rota, usado=True
+                )
 
-                    ultima_posicao = (
-                        Tickets.objects.filter(rota=rota_id, usado=True)
-                        .order_by("-posicao_fila")
-                        .first()
+                if not algum_aluno_passou:
+                    existe_aluno_faltante = Tickets.objects.filter(
+                        rota=ticket.rota, faltante=True
                     )
 
-                    if not ultima_posicao.exists():
-                        return reserva
+                    if ticket.posicao_fila.num_ticket != 1 and existe_aluno_faltante:
+                        return self.ticket_verificado(ticket)
 
-                    if reserva.posicao_fila.num_ticket != (
-                        ultima_posicao.posicao_fila.num_ticket + 1
-                    ):
-                        return Response(
-                            {
-                                "error": "A posição do ticket que está sendo verificado não corresponde a esperada.",
-                                "posicao_esperada": (
-                                    ultima_posicao.posicao_fila.num_ticket + 1
-                                ),
-                                "posicao_passada": reserva.posicao_fila.num_ticket,
-                            },
-                            status=400,
-                        )
+                    return Response(
+                        {
+                            "error": "A posição do ticket que está sendo verificado não corresponde a esperada.",
+                            "posicao_esperada": 1,
+                            "posicao_passada": ticket.posicao_fila.num_ticket,
+                        },
+                        status=400,
+                    )
 
-                    return reserva
+                ultima_posicao = (
+                    Tickets.objects.filter(rota=ticket.rota, usado=True)
+                    .order_by("-posicao_fila")
+                    .first()
+                )
 
-                except UserSoticon.DoesNotExist:
-                    return Response({"error": "Usuário não localizado!"}, status=404)
+                if ultima_posicao and ticket.posicao_fila.num_ticket == (
+                    ultima_posicao.posicao_fila.num_ticket + 1
+                ):
+                    return self.ticket_verificado(ticket)
 
-                except Rota.DoesNotExist:
-                    return Response({"error": "Rota não localizada!"}, status=404)
+                posicao_ultimo_faltante = (
+                    Tickets.objects.filter(rota=ticket.rota, usado=False, faltante=True)
+                    .order_by("-posicao_fila")
+                    .first()
+                )
+
+                if posicao_ultimo_faltante and ticket.posicao_fila.num_ticket == (
+                    posicao_ultimo_faltante.posicao_fila.num_ticket + 1
+                ):
+                    return self.ticket_verificado(ticket)
+
+                posicao_esperada = 0
+
+                if ultima_posicao:
+                    posicao_esperada = ultima_posicao.posicao_fila.num_ticket + 1
+
+                elif posicao_ultimo_faltante:
+                    posicao_esperada = (
+                        posicao_ultimo_faltante.posicao_fila.num_ticket + 1
+                    )
+
+                return Response(
+                    {
+                        "error": "A posição do ticket que está sendo verificado não corresponde a esperada.",
+                        "posicao_esperada": posicao_esperada,
+                        "posicao_passada": ticket.posicao_fila.num_ticket,
+                    },
+                    status=400,
+                )
 
             except Exception as e:
                 print(e)
-                return Response(
-                    {"error": "Erro ao realizar consulta de dados."}, status=500
-                )
 
-    def put(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
-
-    def partial_update(self, request, *args, **kwargs):
-        instance = self.get_object(request)
-        if instance is None:
-            return Response({"error": "Usuário não possui reserva!"}, status=404)
-
-        if instance.usado == True:
-            return Response({"error": "Usuário já usou o ticket."}, status=400)
-
-        serializer = self.get_serializer(
-            instance, data={"usado": True, "faltante": False}, partial=True
-        )
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
+        except Tickets.DoesNotExist:
+            return Response(
+                {"error": "Ticket não encontrado"}, status=status.HTTP_404_NOT_FOUND
+            )
 
 
 @extend_schema(
@@ -654,7 +668,7 @@ class VerificarTickets(ModelViewSet):
     responses={
         status.HTTP_200_OK: OpenApiResponse(description="Ticket Verificado"),
         status.HTTP_400_BAD_REQUEST: OpenApiResponse(
-            description="O usuário não é faltante/O usuário já usou o ticket"
+            description="O usuário não é faltante/O usuário já usou o ticket/O usuário não possui reserva"
         ),
         status.HTTP_404_NOT_FOUND: OpenApiResponse(
             description="Usuário não localizado/Usuário não possui reserva/Rota não localizada."
@@ -666,70 +680,54 @@ class VerificarTickets(ModelViewSet):
 )
 class VerificarTicketsFaltantes(ModelViewSet):
     queryset = Tickets.objects.all()
-    serializer_class = VerificarTicketsEDeclararFaltanteSerializer
     http_method_names = ["put"]
     permission_classes = [IsAuthorizedToOperateRoutes]
 
-    def get_object(self, request):
-        if "user_soticon" and "rota" in request.data:
-            try:
-                user_soticon = request.data.get("user_soticon")
-                rota_id = request.data.get("rota")
-                try:
+    def update(self, request, *args, **kwargs):
+        try:
+            ticket = Tickets.objects.get(pk=kwargs["pk"])
 
-                    UserSoticon.objects.get(pk=user_soticon)
-                    Rota.objects.get(pk=rota_id)
-
-                    reserva = Tickets.objects.filter(
-                        user_soticon=user_soticon, rota=rota_id, reservado=True
-                    ).first()
-
-                    return reserva
-
-                except UserSoticon.DoesNotExist:
-                    return Response({"error": "Usuário não localizado!"}, status=404)
-
-                except Rota.DoesNotExist:
-                    return Response({"error": "Rota não localizada!"}, status=404)
-
-            except Exception as e:
-                print(e)
+            if not ticket.reservado:
                 return Response(
-                    {"error": "Erro ao realizar consulta de dados."}, status=500
+                    {"error": "Usuário não possui reserva!"},
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
 
-    def put(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
+            if ticket.usado:
+                return Response(
+                    {"error": "Usuário já usou o ticket."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-    def partial_update(self, request, *args, **kwargs):
-        instance = self.get_object(request)
-        if instance is None:
-            return Response({"error": "Usuário não possui reserva!"}, status=404)
+            if not ticket.faltante:
+                return Response(
+                    {"error": "Usuário não é faltante."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-        if instance.usado:
-            return Response({"error": "Usuário já usou o ticket."}, status=400)
+            ticket.usado = True
+            ticket.faltante = False
+            ticket.save()
 
-        if not instance.faltante:
-            return Response({"error": "O usuário não é faltante."}, status=400)
+            return Response(
+                {"message": "Ticket verificado com sucesso!"},
+                status=status.HTTP_200_OK,
+            )
 
-        serializer = self.get_serializer(
-            instance, data={"usado": True, "faltante": False}, partial=True
-        )
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
+        except Tickets.DoesNotExist:
+            return Response(
+                {"error": "Ticket não encontrado"}, status=status.HTTP_404_NOT_FOUND
+            )
 
 
 @extend_schema(
     tags=["Soticon.Declarar Aluno Faltante"],
     responses={
-        status.HTTP_200_OK: OpenApiResponse(description="Ticket Verificado"),
+        status.HTTP_200_OK: OpenApiResponse(description="Ticket Atualizado"),
         status.HTTP_400_BAD_REQUEST: OpenApiResponse(
-            description="O usuário já usou o ticket."
+            description="O usuário já usou o ticket/O usuário não possui reserva"
         ),
-        status.HTTP_404_NOT_FOUND: OpenApiResponse(
-            description="Usuário não localizado/Usuário não possui reserva/Rota não localizada."
-        ),
+        status.HTTP_404_NOT_FOUND: OpenApiResponse(description="Ticket não localizado"),
         status.HTTP_500_INTERNAL_SERVER_ERROR: OpenApiResponse(
             description="Erro interno."
         ),
@@ -737,56 +735,38 @@ class VerificarTicketsFaltantes(ModelViewSet):
 )
 class DeclararAlunoFaltante(ModelViewSet):
     queryset = Tickets.objects.all()
-    serializer_class = VerificarTicketsEDeclararFaltanteSerializer
     http_method_names = ["put"]
     permission_classes = [IsAuthorizedToOperateRoutes]
 
-    def get_object(self, request):
-        if "user_soticon" and "rota" in request.data:
-            try:
-                user_soticon = request.data.get("user_soticon")
-                rota_id = request.data.get("rota")
-                try:
+    def update(self, request, *args, **kwargs):
+        try:
+            ticket = Tickets.objects.get(pk=kwargs["pk"])
 
-                    UserSoticon.objects.get(pk=user_soticon)
-                    Rota.objects.get(pk=rota_id)
-
-                    reserva = Tickets.objects.filter(
-                        user_soticon=user_soticon,
-                        rota=rota_id,
-                        reservado=True,
-                    ).first()
-                    return reserva
-
-                except UserSoticon.DoesNotExist:
-                    return Response({"error": "Usuário não localizado!"}, status=404)
-
-                except Rota.DoesNotExist:
-                    return Response({"error": "Rota não localizada!"}, status=404)
-
-            except Exception as e:
-                print(e)
+            if not ticket.reservado:
                 return Response(
-                    {"error": "Erro ao realizar consulta de dados"}, status=500
+                    {"error": "Usuário não possui reserva!"},
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
 
-    def put(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
+            if ticket.usado:
+                return Response(
+                    {"error": "Usuário já usou o ticket."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-    def partial_update(self, request, *args, **kwargs):
-        instance = self.get_object(request)
-        if instance is None:
-            return Response({"error": "Usuário não possui reserva!"}, status=404)
+            ticket.faltante = True
+            ticket.usado = False
+            ticket.save()
 
-        if instance.usado == True:
-            return Response({"error": "Usuário já usou o ticket."}, status=400)
+            return Response(
+                {"message": "Ticket atualizado com sucesso!"},
+                status=status.HTTP_200_OK,
+            )
 
-        serializer = self.get_serializer(
-            instance, data={"usado": False, "faltante": True}, partial=True
-        )
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        return Response(serializer.data)
+        except Tickets.DoesNotExist:
+            return Response(
+                {"error": "Ticket não encontrado"}, status=status.HTTP_404_NOT_FOUND
+            )
 
 
 @extend_schema(tags=["Soticon.Finalizar Rota"])
