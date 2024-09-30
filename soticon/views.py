@@ -359,16 +359,15 @@ class TicketsViewSet(ModelViewSet):
                 faltantes = True
 
         if rota_valida and rota_valida.isnumeric() and faltantes:
-            try:
-                queryset = queryset.filter(
-                    rota=rota_valida, reservado=True, faltante=True
-                )
-                return queryset
-            except Exception as e:
-                print(e)
+            queryset = queryset.filter(
+                rota=rota_valida, reservado=True, faltante=True
+            ).order_by("usado", "posicao_fila")
+            return queryset
 
         elif rota_valida and rota_valida.isnumeric():
-            queryset = queryset.filter(rota=rota_valida, reservado=True, faltante=False)
+            queryset = queryset.filter(
+                rota=rota_valida, reservado=True, faltante=False
+            ).order_by("usado", "posicao_fila")
             return queryset
 
         usuario = self.request.query_params.get("usuario", None)
@@ -588,53 +587,50 @@ class VerificarTickets(ModelViewSet):
                 )
 
                 if not algum_aluno_passou:
-                    existe_aluno_faltante = Tickets.objects.filter(
-                        rota=ticket.rota, faltante=True
+                    aluno_faltante = (
+                        Tickets.objects.filter(rota=ticket.rota, faltante=True)
+                        .order_by("-posicao_fila")
+                        .first()
                     )
 
-                    if ticket.posicao_fila.num_ticket != 1 and existe_aluno_faltante:
+                    if (
+                        aluno_faltante
+                        and ticket.posicao_fila.num_ticket
+                        == aluno_faltante.posicao_fila.num_ticket + 1
+                    ):
                         return self.ticket_verificado(ticket)
+
+                    posicao_esperada = 1
+
+                    if aluno_faltante:
+                        posicao_esperada = aluno_faltante.posicao_fila.num_ticket + 1
 
                     return Response(
                         {
                             "error": "A posição do ticket que está sendo verificado não corresponde a esperada.",
-                            "posicao_esperada": 1,
+                            "posicao_esperada": posicao_esperada,
                             "posicao_passada": ticket.posicao_fila.num_ticket,
                         },
                         status=400,
                     )
 
-                ultima_posicao = (
-                    Tickets.objects.filter(rota=ticket.rota, usado=True)
+                fila = Tickets.objects.filter(rota=ticket.rota)
+
+                fila = (
+                    fila.exclude(usado=False, faltante=False)
                     .order_by("-posicao_fila")
                     .first()
                 )
 
-                if ultima_posicao and ticket.posicao_fila.num_ticket == (
-                    ultima_posicao.posicao_fila.num_ticket + 1
-                ):
-                    return self.ticket_verificado(ticket)
-
-                posicao_ultimo_faltante = (
-                    Tickets.objects.filter(rota=ticket.rota, usado=False, faltante=True)
-                    .order_by("-posicao_fila")
-                    .first()
-                )
-
-                if posicao_ultimo_faltante and ticket.posicao_fila.num_ticket == (
-                    posicao_ultimo_faltante.posicao_fila.num_ticket + 1
+                if fila and ticket.posicao_fila.num_ticket == (
+                    fila.posicao_fila.num_ticket + 1
                 ):
                     return self.ticket_verificado(ticket)
 
                 posicao_esperada = 0
 
-                if ultima_posicao:
-                    posicao_esperada = ultima_posicao.posicao_fila.num_ticket + 1
-
-                elif posicao_ultimo_faltante:
-                    posicao_esperada = (
-                        posicao_ultimo_faltante.posicao_fila.num_ticket + 1
-                    )
+                if fila:
+                    posicao_esperada = fila.posicao_fila.num_ticket + 1
 
                 return Response(
                     {
