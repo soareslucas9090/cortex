@@ -167,7 +167,7 @@ class RotaViewSet(ModelViewSet):
     permission_classes = [
         IsAuthenticated,
     ]
-    http_method_names = ["get", "head", "patch", "delete", "post"]
+    http_method_names = ["get", "head", "put", "delete", "post"]
 
     @extend_schema(
         parameters=[
