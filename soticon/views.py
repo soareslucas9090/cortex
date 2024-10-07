@@ -240,7 +240,7 @@ class RotaViewSet(ModelViewSet):
                 a_partir_de_hoje = True
 
         if a_partir_de_hoje:
-            return queryset.filter(data__gte=datetime.date.now())
+            return queryset.filter(data__gte=datetime.now())
 
         ######## Filtro de data para rotas válidas para agendamento ########
 
