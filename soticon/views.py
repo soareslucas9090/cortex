@@ -179,6 +179,13 @@ class RotaViewSet(ModelViewSet):
                 location=OpenApiParameter.QUERY,
             ),
             OpenApiParameter(
+                name="gte",
+                type=OpenApiTypes.BOOL,
+                description="Filtra as rotas a partir do dia de pesquisa",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
                 name="data",
                 type=OpenApiTypes.STR,
                 description="Filtra as rotas pela data",
@@ -220,6 +227,20 @@ class RotaViewSet(ModelViewSet):
 
         if data_formatada:
             return queryset.filter(data=data_formatada)
+
+        ######## Filtro de rotas a partir de hoje ########
+
+        a_partir_de_hoje = self.request.query_params.get("gte", None)
+
+        if a_partir_de_hoje:
+            if a_partir_de_hoje.lower() == "false":
+                a_partir_de_hoje = False
+
+            elif a_partir_de_hoje.lower() == "true":
+                a_partir_de_hoje = True
+
+        if a_partir_de_hoje:
+            return queryset.filter(data__gte=datetime.date.now())
 
         ######## Filtro de data para rotas válidas para agendamento ########
 
