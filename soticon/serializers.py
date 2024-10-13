@@ -147,3 +147,9 @@ class ReservarTicketSerializer(serializers.Serializer):
 class FinalizarRotaSerializer(serializers.Serializer):
     status = serializers.CharField(required=True)
     obs = serializers.CharField(required=False)
+
+
+class RotasAutomaticasSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RotasAutomaticas
+        fields = "__all__"

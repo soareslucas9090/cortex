@@ -837,3 +837,102 @@ class FinalizarRota(ModelViewSet):
             instance.save()
 
         return Response({"result": "Rota finalizada"}, status=status.HTTP_200_OK)
+
+
+@extend_schema(tags=["Soticon.Rotas Automáticas"])
+class RotasAutomaticasViewSet(ModelViewSet):
+    queryset = RotasAutomaticas.objects.all()
+    serializer_class = RotasAutomaticasSerializer
+    permission_classes = [
+        IsSectorAuthorizedToChangeRoutes,
+    ]
+    http_method_names = ["get", "post", "put", "delete"]
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="dia",
+                type=OpenApiTypes.STR,
+                description="Filtra as rotas automáticas pelo dia da semana.",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        dia_da_semana = self.request.query_params.get("dia", None)
+
+        if dia_da_semana:
+            queryset = queryset.filter(dia_da_semana=dia_da_semana)
+
+        return queryset
+
+
+@extend_schema(tags=["Soticon.Rotas Automáticas"])
+class CriarRotasAutomaticas(ModelViewSet):
+    queryset = RotasAutomaticas.objects.all()
+    permission_classes = [
+        IsSectorAuthorizedToChangeRoutes,
+    ]
+    http_method_names = ["post"]
+
+    def create(self, request, *args, **kwargs):
+        try:
+            DIA_SEMANA_MAP = {
+                "segunda": 0,
+                "terça": 1,
+                "quarta": 2,
+                "quinta": 3,
+                "sexta": 4,
+                "sabado": 5,
+                "domingo": 6,
+            }
+            hoje = date.today()
+            rotas_automaticas = RotasAutomaticas.objects.all()
+            rotas_criadas = []
+
+            for rota_automatica in rotas_automaticas:
+                dia_semana_numero = DIA_SEMANA_MAP.get(
+                    rota_automatica.dia_da_semana.lower()
+                )
+
+                dias_para_proximo_dia = (dia_semana_numero - hoje.weekday()) % 7
+
+                proxima_data = hoje + timedelta(days=dias_para_proximo_dia)
+
+                try:
+                    rota_existente = Rota.objects.get(
+                        data=proxima_data,
+                        horario=rota_automatica.horario,
+                        status="espera",
+                    )
+
+                    if rota_existente:
+                        continue
+
+                except Rota.DoesNotExist:
+                    nova_rota = Rota.objects.create(
+                        obs="Rota Automática",
+                        data=proxima_data,
+                        horario=rota_automatica.horario,
+                        status="espera",
+                    )
+                    rotas_criadas.append(nova_rota)
+
+            return Response(
+                {
+                    "success": "Rotas criadas com sucesso!",
+                    "rotas_criadas": [
+                        {"id": rota.id, "data": rota.data, "horario": rota.horario}
+                        for rota in rotas_criadas
+                    ],
+                }
+            )
+
+        except Exception as e:
+            print(e)

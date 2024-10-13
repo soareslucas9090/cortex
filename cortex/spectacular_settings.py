@@ -82,6 +82,11 @@ SPECTACULAR_SETTINGS = {
             "description": "Rotas relacionadas com as rotas do ônibus.",
         },
         {
+            "name": "Soticon.Rotas Automáticas",
+            "description": """Rotas relacionadas com as rotas automáticas do ônibus.\n
+            Dias válidos para criação de rotas automáticas: "segunda", "terca", "quarta", "quinta", "sexta", "sabado", "domingo".""",
+        },
+        {
             "name": "Soticon.Tickets",
             "description": "Rotas relacionadas com tickets reservados.",
         },

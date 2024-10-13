@@ -70,6 +70,24 @@ class Rota(modelsUsusarios.Base):
         ordering = ["-data"]
 
 
+class RotasAutomaticas(models.Model):
+    DIAS_DA_SEMANA = [
+        ("segunda", "Segunda-feira"),
+        ("terca", "Terça-feira"),
+        ("quarta", "Quarta-feira"),
+        ("quinta", "Quinta-feira"),
+        ("sexta", "Sexta-feira"),
+        ("sabado", "Sábado"),
+        ("domingo", "Domingo"),
+    ]
+
+    horario = models.TimeField(null=False)
+    dia_da_semana = models.CharField(max_length=10, choices=DIAS_DA_SEMANA, null=False)
+
+    def __str__(self):
+        return f"{self.dia_da_semana} às {self.horario}"
+
+
 class Tickets(models.Model):
     rota = models.ForeignKey(
         Rota, related_name="tickets_rota", on_delete=models.RESTRICT, null=False
