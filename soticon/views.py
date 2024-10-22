@@ -212,7 +212,6 @@ class RotaViewSet(ModelViewSet):
 
         if status:
             queryset = queryset.filter(status=status)
-            return queryset
 
         ######## Filtro de data geral ########
 
@@ -226,7 +225,7 @@ class RotaViewSet(ModelViewSet):
             data_formatada = None
 
         if data_formatada:
-            return queryset.filter(data=data_formatada)
+            queryset = queryset.filter(data=data_formatada)
 
         ######## Filtro de rotas a partir de hoje ########
 
@@ -240,7 +239,7 @@ class RotaViewSet(ModelViewSet):
                 a_partir_de_hoje = True
 
         if a_partir_de_hoje:
-            return queryset.filter(data__gte=datetime.now())
+            queryset = queryset.filter(data__gte=datetime.now())
 
         ######## Filtro de data para rotas válidas para agendamento ########
 
@@ -255,7 +254,7 @@ class RotaViewSet(ModelViewSet):
         horario_permitido = datetime.now() + timedelta(minutes=20)
 
         if data_valida_formatada:
-            return queryset.filter(
+            queryset = queryset.filter(
                 data=data_valida_formatada,
                 status="espera",
                 horario__gte=horario_permitido,
