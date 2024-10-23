@@ -251,7 +251,12 @@ class RotaViewSet(ModelViewSet):
         except:
             data_valida_formatada = None
 
-        horario_permitido = datetime.now() + timedelta(minutes=20)
+        minutos_permitidos = Regras.objects.get(
+            descricao="tempo_ate_fechamento_reservas"
+        )
+        horario_permitido = datetime.now() + timedelta(
+            minutes=minutos_permitidos.parametro
+        )
 
         if data_valida_formatada:
             queryset = queryset.filter(
@@ -358,8 +363,37 @@ class TicketsViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
 
+        usuario = self.request.query_params.get("usuario", None)
+
         if IsStudent().has_permission(self.request, self):
+            if usuario:
+                try:
+                    user_soticon = UserSoticon.objects.get(id=usuario)
+                    if user_soticon.usuario == self.request.user:
+                        data_atual = date.today()
+                        queryset = queryset.filter(
+                            user_soticon=usuario,
+                            usado=False,
+                            reservado=True,
+                            rota__data=data_atual,
+                            rota__status="espera",
+                        )
+
+                        return queryset
+                except:
+                    pass
+
             return queryset.filter(id=0)
+
+        if usuario:
+            data_atual = date.today()
+            queryset = queryset.filter(
+                user_soticon=usuario,
+                usado=False,
+                reservado=True,
+                rota__data=data_atual,
+                rota__status="espera",
+            )
 
         rota = self.request.query_params.get("rota", None)
 
@@ -388,15 +422,6 @@ class TicketsViewSet(ModelViewSet):
             queryset = queryset.filter(
                 rota=rota_valida, reservado=True, faltante=False
             ).order_by("usado", "posicao_fila")
-            return queryset
-
-        usuario = self.request.query_params.get("usuario", None)
-
-        if usuario:
-            data_atual = date.today()
-            queryset = queryset.filter(
-                user_soticon=usuario, usado=False, reservado=True, rota__data=data_atual
-            )
             return queryset
 
         return queryset
@@ -438,10 +463,14 @@ class TicketsViewSet(ModelViewSet):
         return super().list(request, *args, **kwargs)
 
     def get_serializer_class(self):
-        if self.request.query_params.get(
-            "rota_valida", None
-        ) or self.request.query_params.get("usuario", None):
-            return TicketsDetalhadosSerializer
+        if self.request.query_params.get("rota_valida", None):
+            return TicketsDetalhadosParaVerificacaoSerializer
+
+        elif self.request.query_params.get("usuario", None):
+            try:
+                return TicketsDetalhadosParaDetalhesUsuarioSerializer
+            except Exception as e:
+                print(e)
 
         return self.serializer_class
 

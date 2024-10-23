@@ -48,12 +48,19 @@ def create_default_regras_soticon(sender, **kwargs):
     Regras = sender.get_model("Regras")
 
     try:
+        # Regra de quantidade de vagas no onibus
         try:
-            regra = Regras.objects.get(descricao="num_vagas_onibus")
-            regra.parametro = 84
-            regra.save()
+            Regras.objects.get(descricao="num_vagas_onibus")
         except:
             Regras.objects.create(descricao="num_vagas_onibus", parametro=84)
+
+        # Regra de tempo para o fechamento das reservas de tickets
+        try:
+            Regras.objects.get(descricao="tempo_ate_fechamento_reservas")
+        except:
+            Regras.objects.create(
+                descricao="tempo_ate_fechamento_reservas", parametro=30
+            )
 
     except OperationalError:
         print("Não foi possível realizar migrate das regras do Soticon")

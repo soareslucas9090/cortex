@@ -3,6 +3,8 @@ from rest_framework import permissions
 
 from gerUsuarios.models import Setor_User
 
+from .models import UserSoticon
+
 
 class IsSectorAuthorizedToChangeRoutes(permissions.BasePermission):
     def has_permission(self, request, view):

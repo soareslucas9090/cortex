@@ -79,7 +79,7 @@ class TicketsSerializer(serializers.ModelSerializer):
     )
 
 
-class TicketsDetalhadosSerializer(serializers.ModelSerializer):
+class TicketsDetalhadosParaVerificacaoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tickets
         fields = "__all__"
@@ -126,6 +126,25 @@ class TicketsDetalhadosSerializer(serializers.ModelSerializer):
     posicao_fila = serializers.PrimaryKeyRelatedField(
         queryset=PosicaoFila.objects.all(), required=False, allow_null=True
     )
+
+
+class TicketsDetalhadosParaDetalhesUsuarioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tickets
+        fields = ["posicao_fila", "data", "horario"]
+
+    posicao_fila = serializers.PrimaryKeyRelatedField(
+        queryset=PosicaoFila.objects.all()
+    )
+
+    data = serializers.SerializerMethodField()
+    horario = serializers.SerializerMethodField()
+
+    def get_data(self, obj):
+        return obj.rota.data
+
+    def get_horario(self, obj):
+        return obj.rota.horario
 
 
 class SoticonTicketsSerializer(serializers.ModelSerializer):

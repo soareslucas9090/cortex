@@ -7,14 +7,11 @@ BEGIN
     timezone_config := current_setting('TimeZone');
 
     -- Verificando qual o fuso horário do banco
-    IF timezone_config = 'America/Sao_Paulo' THEN
-        interval_time := INTERVAL '10 minutes';
-    ELSEIF timezone_config = 'UTC' THEN
-        interval_time := INTERVAL '-2 hours -50 minutes';
-    ELSE
-        -- Fuso horário não previsto
-        interval_time := INTERVAL '10 minutes';
+    IF timezone_config != 'America/Sao_Paulo' THEN
+        SET TIMEZONE TO 'America/Sao_Paulo';
     END IF;
+
+    interval_time := INTERVAL '10 minutes';
 
     UPDATE soticon_rota
     SET status = 'executada'
