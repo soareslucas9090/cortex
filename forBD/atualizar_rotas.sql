@@ -11,14 +11,14 @@ BEGIN
         SET TIMEZONE TO 'America/Sao_Paulo';
     END IF;
 
-    interval_time := INTERVAL '10 minutes';
+    interval_time := INTERVAL '15 minutes';
 
     UPDATE soticon_rota
     SET status = 'executada'
     WHERE status = 'espera'
     AND (
         data < CURRENT_DATE
-        OR (data = CURRENT_DATE AND horario < CURRENT_TIME + interval_time)
+        OR (data = CURRENT_DATE AND CURRENT_TIME > horario + interval_time)
     );
 END;
 $$ LANGUAGE plpgsql;
