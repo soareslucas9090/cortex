@@ -267,39 +267,6 @@ class RotaViewSet(ModelViewSet):
 
         return queryset
 
-    @extend_schema(
-        description="Retorna dados dos tickets reservados para aquela rota também.",
-    )
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-
-        serializer.data["tickets"] = []
-
-        tickets = Tickets.objects.filter(rota=instance, reservado=True)
-
-        if tickets:
-            tickets_reservados = []
-
-            for ticket in tickets:
-
-                ticket_data = {
-                    "user": [
-                        {
-                            "id": ticket.user_soticon.id,
-                            "nome": ticket.user_soticon.usuario.nome,
-                        }
-                    ],
-                    "usado": ticket.usado,
-                    "num_ticket": ticket.posicao_fila.num_ticket,
-                }
-
-                tickets_reservados.append(ticket_data)
-
-            serializer.data["tickets"] = tickets_reservados
-
-        return Response(serializer.data)
-
     def get_permissions(self):
         if self.request.method in ["PATCH", "DELETE", "POST"]:
             return [IsSectorAuthorizedToChangeRoutes()]
@@ -437,6 +404,13 @@ class TicketsViewSet(ModelViewSet):
                 location=OpenApiParameter.QUERY,
             ),
             OpenApiParameter(
+                name="contagem",
+                type=OpenApiTypes.BOOL,
+                description="Quando True, retorna o número totais de tickets reservados e tickets usados, precisa ser usado junto com ?rota=X",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
                 name="rota_valida",
                 type=OpenApiTypes.INT,
                 description="Filtra os tickets efetivamente reservados para uma determinada rota",
@@ -460,6 +434,23 @@ class TicketsViewSet(ModelViewSet):
         ],
     )
     def list(self, request, *args, **kwargs):
+        contagem = self.request.query_params.get("contagem", None)
+
+        if contagem:
+
+            rota = self.request.query_params.get("rota", None)
+
+            if contagem.lower() == "true" and rota and rota.isnumeric():
+                usados = self.queryset.filter(usado=True, rota=rota).count()
+                total = self.queryset.filter(reservado=True, rota=rota).count()
+
+                dict = {
+                    "usados": usados,
+                    "total": total,
+                }
+
+                return Response(dict, status=status.HTTP_200_OK)
+
         return super().list(request, *args, **kwargs)
 
     def get_serializer_class(self):
