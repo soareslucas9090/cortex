@@ -386,6 +386,16 @@ class TicketsViewSet(ModelViewSet):
             return queryset
 
         elif rota_valida and rota_valida.isnumeric():
+
+            todos = self.request.query_params.get("todos", None)
+
+            if todos:
+                if todos.lower() == "true":
+                    queryset = queryset.filter(
+                        rota=rota_valida, reservado=True
+                    ).order_by("posicao_fila")
+                return queryset
+
             queryset = queryset.filter(
                 rota=rota_valida, reservado=True, faltante=False
             ).order_by("usado", "posicao_fila")
@@ -421,6 +431,13 @@ class TicketsViewSet(ModelViewSet):
                 name="faltantes",
                 type=OpenApiTypes.BOOL,
                 description="Filtra os tickets de usuários faltantes para uma rota válida (use junto com rota_valida)",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
+                name="todos",
+                type=OpenApiTypes.BOOL,
+                description="Filtra todos os tickets de usuários para uma rota válida (use junto com rota_valida)",
                 required=False,
                 location=OpenApiParameter.QUERY,
             ),
