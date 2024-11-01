@@ -3,18 +3,19 @@ from rest_framework.routers import SimpleRouter
 
 from .views import *
 
-blog_router = SimpleRouter()
-blog_router.register("tipos", TipoViewSet)
-blog_router.register("enderecos", EnderecoViewSet)
-blog_router.register("contatos", ContatoViewSet)
-blog_router.register("empresas", EmpresaViewSet)
-blog_router.register("users", UserViewSet)
-blog_router.register("setores", SetorViewSet)
-blog_router.register("matriculas", MatriculaViewSet)
+gerUsers_router = SimpleRouter()
+gerUsers_router.register("tipos", TipoViewSet)
+gerUsers_router.register("enderecos", EnderecoViewSet)
+gerUsers_router.register("contatos", ContatoViewSet)
+gerUsers_router.register("empresas", EmpresaViewSet)
+gerUsers_router.register("users", UserViewSet)
+gerUsers_router.register("setores", SetorViewSet)
+gerUsers_router.register("matriculas", MatriculaViewSet)
+gerUsers_router.register("deficiencias", DeficienciaViewSet)
 
 
 urlpatterns = [
-    path("", include(blog_router.urls)),
+    path("", include(gerUsers_router.urls)),
     path(
         "password/reset/", PasswordResetRequestAPIView.as_view(), name="reset-password"
     ),

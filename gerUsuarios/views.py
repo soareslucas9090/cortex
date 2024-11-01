@@ -770,3 +770,13 @@ class MatriculaViewSet(ModelViewSet):
             return [IsAdminOrTI()]
 
         return super().get_permissions()
+
+
+@extend_schema(tags=["Gerenciamento De Usuários.Deficiencias"])
+class DeficienciaViewSet(ModelViewSet):
+    queryset = Deficiencia.objects.all()
+    serializer_class = DeficienciaSerializer
+    permission_classes = [
+        IsAuthenticated,
+    ]
+    http_method_names = ["get"]

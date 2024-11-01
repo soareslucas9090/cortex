@@ -32,6 +32,11 @@ SPECTACULAR_SETTINGS = {
             "description": "Rotas relacionadas com os usuários",
         },
         {
+            "name": "Gerenciamento De Usuários.Deficiencias",
+            "description": """Rotas relacionadas os tipos de deficiências.\n
+    Tipos padrões: "Deficiência física", "Deficiência auditiva", "Deficiência visual", "Deficiência intelectual", "Deficiência psicossocial ou por saúde mental", "Deficiência múltipla".""",
+        },
+        {
             "name": "Gerenciamento De Usuários.Inserir Vários Alunos",
             "description": "Rota para inserção de Alunos em Lote",
         },

@@ -585,3 +585,9 @@ class Matricula2UserSerializer(serializers.ModelSerializer):
             "matricula",
             "is_ativo",
         ]
+
+
+class DeficienciaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Deficiencia
+        fields = "__all__"
