@@ -86,8 +86,34 @@ class TicketsDetalhadosParaVerificacaoSerializer(serializers.ModelSerializer):
 
     nome = serializers.SerializerMethodField()
     cpf = serializers.SerializerMethodField()
+    deficiencia = serializers.SerializerMethodField()
     usuario = None
     obj_test = None
+
+    def get_deficiencia(self, obj):
+        if self.usuario:
+            if self.obj_test != obj:
+                self.obj_test = obj
+                self.usuario = User.objects.get(id=obj.user_soticon.usuario.id)
+                if self.usuario.deficiencia:
+                    deficiencia = self.usuario.deficiencia.nome
+                    return deficiencia
+                else:
+                    return None
+            else:
+                if self.usuario.deficiencia:
+                    deficiencia = self.usuario.deficiencia.nome
+                    return deficiencia
+                else:
+                    return None
+        else:
+            self.obj_test = obj
+            self.usuario = User.objects.get(id=obj.user_soticon.usuario.id)
+            if self.usuario.deficiencia:
+                deficiencia = self.usuario.deficiencia.nome
+                return deficiencia
+            else:
+                return None
 
     def get_nome(self, obj):
         if self.usuario:

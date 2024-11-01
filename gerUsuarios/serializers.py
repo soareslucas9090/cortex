@@ -100,6 +100,8 @@ class UserSerializer(serializers.ModelSerializer):
             "nome",
             "email",
             "cpf",
+            "deficiencia",
+            "nome_deficiencia",
             "setores",
             "nome_setores",
             "tipo",
@@ -114,6 +116,9 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
     password = serializers.CharField(write_only=True)
+    deficiencia = serializers.PrimaryKeyRelatedField(
+        queryset=Deficiencia.objects.all(), write_only=True
+    )
     setores = serializers.PrimaryKeyRelatedField(
         queryset=Setor.objects.all(), many=True, allow_empty=False, write_only=True
     )
@@ -128,11 +133,19 @@ class UserSerializer(serializers.ModelSerializer):
         queryset=Empresa.objects.all(), allow_empty=False, write_only=True
     )
 
+    nome_deficiencia = serializers.SerializerMethodField(read_only=True)
     nome_tipo = serializers.SerializerMethodField(read_only=True)
     nome_contato = serializers.SerializerMethodField(read_only=True)
     nome_empresa = serializers.SerializerMethodField(read_only=True)
     nome_setores = serializers.SerializerMethodField(read_only=True)
     matricula = serializers.SerializerMethodField()
+
+    def get_nome_deficiencia(self, obj) -> str:
+        try:
+            deficiencia = Deficiencia.objects.get(id=obj.deficiencia.id).nome
+            return deficiencia
+        except:
+            return None
 
     def get_nome_tipo(self, obj) -> str:
         try:

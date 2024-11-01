@@ -1,5 +1,6 @@
 from datetime import date, datetime, timedelta
 
+from django.db.models import Case, IntegerField, Value, When
 from drf_spectacular.utils import (
     OpenApiExample,
     OpenApiParameter,
@@ -380,9 +381,24 @@ class TicketsViewSet(ModelViewSet):
                 faltantes = True
 
         if rota_valida and rota_valida.isnumeric() and faltantes:
-            queryset = queryset.filter(
-                rota=rota_valida, reservado=True, faltante=True
-            ).order_by("usado", "posicao_fila")
+            queryset = (
+                queryset.filter(rota=rota_valida, reservado=True, faltante=True)
+                .annotate(
+                    deficiencia_priority=Case(
+                        When(
+                            user_soticon__usuario__deficiencia__isnull=False,
+                            then=Value(0),
+                        ),
+                        default=Value(1),
+                        output_field=IntegerField(),
+                    )
+                )
+                .order_by(
+                    "usado",
+                    "deficiencia_priority",
+                    "posicao_fila",
+                )
+            )
             return queryset
 
         elif rota_valida and rota_valida.isnumeric():
@@ -396,9 +412,25 @@ class TicketsViewSet(ModelViewSet):
                     ).order_by("posicao_fila")
                 return queryset
 
-            queryset = queryset.filter(
-                rota=rota_valida, reservado=True, faltante=False
-            ).order_by("usado", "posicao_fila")
+            queryset = (
+                queryset.filter(rota=rota_valida, reservado=True, faltante=False)
+                .annotate(
+                    deficiencia_priority=Case(
+                        When(
+                            user_soticon__usuario__deficiencia__isnull=False,
+                            then=Value(0),
+                        ),
+                        default=Value(1),
+                        output_field=IntegerField(),
+                    )
+                )
+                .order_by(
+                    "usado",
+                    "deficiencia_priority",
+                    "posicao_fila",
+                )
+            )
+
             return queryset
 
         return queryset
@@ -636,63 +668,35 @@ class VerificarTickets(ModelViewSet):
 
             try:
 
-                if ticket.posicao_fila.num_ticket == 1:
-                    return self.ticket_verificado(ticket)
-
-                algum_aluno_passou = Tickets.objects.filter(
-                    rota=ticket.rota, usado=True
-                )
-
-                if not algum_aluno_passou:
-                    aluno_faltante = (
-                        Tickets.objects.filter(rota=ticket.rota, faltante=True)
-                        .order_by("-posicao_fila")
-                        .first()
+                posicao_esperada = (
+                    Tickets.objects.filter(
+                        rota=ticket.rota, reservado=True, faltante=False, usado=False
                     )
-
-                    if (
-                        aluno_faltante
-                        and ticket.posicao_fila.num_ticket
-                        == aluno_faltante.posicao_fila.num_ticket + 1
-                    ):
-                        return self.ticket_verificado(ticket)
-
-                    posicao_esperada = 1
-
-                    if aluno_faltante:
-                        posicao_esperada = aluno_faltante.posicao_fila.num_ticket + 1
-
-                    return Response(
-                        {
-                            "error": "A posição do ticket que está sendo verificado não corresponde a esperada.",
-                            "posicao_esperada": posicao_esperada,
-                            "posicao_passada": ticket.posicao_fila.num_ticket,
-                        },
-                        status=400,
+                    .annotate(
+                        deficiencia_priority=Case(
+                            When(
+                                user_soticon__usuario__deficiencia__isnull=False,
+                                then=Value(0),
+                            ),
+                            default=Value(1),
+                            output_field=IntegerField(),
+                        )
                     )
-
-                fila = Tickets.objects.filter(rota=ticket.rota)
-
-                fila = (
-                    fila.exclude(usado=False, faltante=False)
-                    .order_by("-posicao_fila")
+                    .order_by(
+                        "deficiencia_priority",
+                        "posicao_fila",
+                    )
                     .first()
                 )
 
-                if fila and ticket.posicao_fila.num_ticket == (
-                    fila.posicao_fila.num_ticket + 1
-                ):
+                if posicao_esperada.posicao_fila == ticket.posicao_fila:
                     return self.ticket_verificado(ticket)
 
-                posicao_esperada = 0
-
-                if fila:
-                    posicao_esperada = fila.posicao_fila.num_ticket + 1
-
+                print("aqui")
                 return Response(
                     {
                         "error": "A posição do ticket que está sendo verificado não corresponde a esperada.",
-                        "posicao_esperada": posicao_esperada,
+                        "posicao_esperada": posicao_esperada.posicao_fila.num_ticket,
                         "posicao_passada": ticket.posicao_fila.num_ticket,
                     },
                     status=400,

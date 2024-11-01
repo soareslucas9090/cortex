@@ -77,7 +77,7 @@ class UserAdmin(admin.ModelAdmin):
     fieldsets = [
         ("Credenciais", {"fields": ["cpf", "password"]}),
         (
-            "Iformações pessoais",
+            "Informações pessoais",
             {
                 "fields": (
                     "nome",
@@ -85,6 +85,7 @@ class UserAdmin(admin.ModelAdmin):
                     "email",
                     "contato",
                     "empresa",
+                    "deficiencia",
                 )
             },
         ),
@@ -160,6 +161,11 @@ class MatriculaAdmin(admin.ModelAdmin):
     ordering = ("matricula",)
 
 
+class DeficienciaAdmin(admin.ModelAdmin):
+    list_display = ("id", "nome")
+    search_fields = ("nome",)
+
+
 admin_custom_site.register(User, UserAdmin)
 admin_custom_site.register(Endereco, EnderecoAdmin)
 admin_custom_site.register(Tipo, TipoAdmin)
@@ -167,3 +173,4 @@ admin_custom_site.register(Contato, ContatoAdmin)
 admin_custom_site.register(Empresa, EmpresaAdmin)
 admin_custom_site.register(Setor, SetorAdmin)
 admin_custom_site.register(Matricula, MatriculaAdmin)
+admin_custom_site.register(Deficiencia, DeficienciaAdmin)

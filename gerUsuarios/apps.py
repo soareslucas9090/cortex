@@ -8,11 +8,12 @@ class GerusuariosConfig(AppConfig):
     name = "gerUsuarios"
 
     def ready(self):
-        from .models import Empresa, Setor, Tipo
+        from .models import Deficiencia, Empresa, Setor, Tipo
 
         post_migrate.connect(create_default_tipos, sender=self)
         post_migrate.connect(create_default_setores, sender=self)
         post_migrate.connect(create_default_empresa, sender=self)
+        post_migrate.connect(create_default_deficiencia, sender=self)
 
 
 def create_default_tipos(sender, **kwargs):
@@ -101,3 +102,23 @@ def create_default_empresa(sender, **kwargs):
     except:
         Empresa.objects.create(cnpj="10806496000491", nome="IFPI - Campus Floriano")
         pass
+
+
+def create_default_deficiencia(sender, **kwargs):
+    Deficiencia = sender.get_model("Deficiencia")
+
+    deficiencias = [
+        "Deficiência física",
+        "Deficiência auditiva",
+        "Deficiência visual",
+        "Deficiência intelectual",
+        "Deficiência psicossocial ou por saúde mental",
+        "Deficiência múltipla",
+    ]
+
+    for deficiencia in deficiencias:
+        try:
+            Deficiencia.objects.get_or_create(nome=deficiencia.lower())
+        except OperationalError:
+            print("Não foi possível realizar migrate de dados de Deficiencias")
+            pass

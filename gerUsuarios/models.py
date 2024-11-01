@@ -177,7 +177,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     cpf = models.CharField(max_length=11, null=False, unique=True)
     data_nascimento = models.DateField(null=True)
     setores = models.ManyToManyField("Setor", through="Setor_User")
-
+    deficiencia = models.ForeignKey(
+        "Deficiencia",
+        related_name="usuarios_deficiencia",
+        on_delete=models.RESTRICT,
+        null=True,
+    )
     date_joined = models.DateTimeField(auto_now_add=True)
 
     is_active = models.BooleanField(default=True)
@@ -284,4 +289,12 @@ class Matricula(Base):
 
     def __str__(self):
         str = f"{self.matricula}"
+        return str
+
+
+class Deficiencia(Base):
+    nome = models.CharField(max_length=50, null=False, unique=True)
+
+    def __str__(self):
+        str = f"{self.nome}"
         return str
