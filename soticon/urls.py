@@ -25,6 +25,9 @@ soticon_router.register("finalizar_rota", FinalizarRota, basename="finalizar_rot
 soticon_router.register(
     "criar_rotas_automaticas", CriarRotasAutomaticas, basename="criar_rotas_automaticas"
 )
+soticon_router.register(
+    "relatorio_rotas", RelatorioRotasViewSet, basename="relatorio_rotas"
+)
 
 urlpatterns = [
     path("", include(soticon_router.urls)),

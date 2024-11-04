@@ -61,6 +61,7 @@ class Rota(modelsUsusarios.Base):
     data = models.DateField(null=False)
     status = models.CharField(max_length=30, null=False)
     horario = models.TimeField(null=False)
+    embarques_sem_tickets = models.IntegerField(null=True)
 
     def __str__(self):
         str = f"{self.horario}"

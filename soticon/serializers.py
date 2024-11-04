@@ -192,9 +192,20 @@ class ReservarTicketSerializer(serializers.Serializer):
 class FinalizarRotaSerializer(serializers.Serializer):
     status = serializers.CharField(required=True)
     obs = serializers.CharField(required=False)
+    embarques_sem_tickets = serializers.IntegerField(required=False)
 
 
 class RotasAutomaticasSerializer(serializers.ModelSerializer):
     class Meta:
         model = RotasAutomaticas
         fields = "__all__"
+
+
+class RelatorioRotasSerializer(serializers.Serializer):
+    data = serializers.DateField(read_only=True)
+    horario = serializers.TimeField(read_only=True)
+    emitidos = serializers.IntegerField(read_only=True)
+    confirmados = serializers.IntegerField(read_only=True)
+    faltantes = serializers.IntegerField(read_only=True)
+    sem_ticket = serializers.IntegerField(read_only=True)
+    total = serializers.IntegerField(read_only=True)

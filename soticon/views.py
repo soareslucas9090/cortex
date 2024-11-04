@@ -1,6 +1,7 @@
 from datetime import date, datetime, timedelta
 
 from django.db.models import Case, IntegerField, Value, When
+from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import (
     OpenApiExample,
     OpenApiParameter,
@@ -9,7 +10,7 @@ from drf_spectacular.utils import (
     extend_schema,
 )
 from rest_framework import status
-from rest_framework.mixins import CreateModelMixin
+from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
@@ -863,7 +864,16 @@ class FinalizarRota(ModelViewSet):
         dados = request.data
 
         if dados["status"].lower() == "executada":
+            embarques_sem_tickets = dados.get("embarques_sem_tickets", None)
+
+            if not embarques_sem_tickets:
+                return Response(
+                    {"result": 'Informe um valor inteiro para "embarques_sem_tickets"'},
+                    status=400,
+                )
+
             instance.status = "executada"
+            instance.embarques_sem_tickets = embarques_sem_tickets
             instance.save()
 
         else:
@@ -974,5 +984,45 @@ class CriarRotasAutomaticas(ModelViewSet):
                 }
             )
 
+        except Exception as e:
+            print(e)
+
+
+@extend_schema(tags=["Soticon.Rotas"])
+class RelatorioRotasViewSet(GenericViewSet, RetrieveModelMixin):
+    queryset = Rota.objects.all()
+    serializer_class = RelatorioRotasSerializer
+    permission_classes = [
+        IsSectorAuthorizedToChangeRoutes,
+    ]
+    http_method_names = ["get"]
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            rota = get_object_or_404(Rota, pk=kwargs["pk"])
+
+            if rota.status != "executada":
+                return Response(
+                    {"error": 'O status da rota precisa ser "executada".'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            data = {}
+            data["data"] = rota.data
+            data["horario"] = rota.horario
+            data["emitidos"] = Tickets.objects.filter(rota=rota, reservado=True).count()
+            data["confirmados"] = Tickets.objects.filter(rota=rota, usado=True).count()
+            data["faltantes"] = Tickets.objects.filter(
+                rota=rota, reservado=True, faltante=True
+            ).count()
+
+            if rota.embarques_sem_tickets:
+                data["sem_ticket"] = rota.embarques_sem_tickets
+            else:
+                data["sem_ticket"] = 0
+
+            data["total"] = data["confirmados"] + data["sem_ticket"]
+
+            return Response(data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
