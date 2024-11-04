@@ -87,8 +87,24 @@ class TicketsDetalhadosParaVerificacaoSerializer(serializers.ModelSerializer):
     nome = serializers.SerializerMethodField()
     cpf = serializers.SerializerMethodField()
     deficiencia = serializers.SerializerMethodField()
+    foto = serializers.SerializerMethodField()
     usuario = None
     obj_test = None
+
+    def get_foto(self, obj):
+        if self.usuario:
+            if self.obj_test != obj:
+                self.obj_test = obj
+                self.usuario = User.objects.get(id=obj.user_soticon.usuario.id)
+                foto = self.usuario.foto
+                return foto
+            else:
+                return self.usuario.foto
+        else:
+            self.obj_test = obj
+            self.usuario = User.objects.get(id=obj.user_soticon.usuario.id)
+            foto = self.usuario.foto
+            return foto
 
     def get_deficiencia(self, obj):
         if self.usuario:

@@ -98,6 +98,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "nome",
+            "foto",
             "email",
             "cpf",
             "deficiencia",
