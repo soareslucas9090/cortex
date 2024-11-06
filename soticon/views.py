@@ -866,7 +866,7 @@ class FinalizarRota(ModelViewSet):
         if dados["status"].lower() == "executada":
             embarques_sem_tickets = dados.get("embarques_sem_tickets", None)
 
-            if not embarques_sem_tickets:
+            if not embarques_sem_tickets and embarques_sem_tickets != 0:
                 return Response(
                     {"result": 'Informe um valor inteiro para "embarques_sem_tickets"'},
                     status=400,
