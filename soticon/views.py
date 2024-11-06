@@ -195,6 +195,20 @@ class RotaViewSet(ModelViewSet):
                 location=OpenApiParameter.QUERY,
             ),
             OpenApiParameter(
+                name="data_inicial",
+                type=OpenApiTypes.STR,
+                description="Filtra as rotas entre a data inicial e a data final (deve ser usada junto a data_final)",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
+                name="data_final",
+                type=OpenApiTypes.STR,
+                description="Filtra as rotas entre a data inicial e a data final (deve ser usada junto a data_inicial)",
+                required=False,
+                location=OpenApiParameter.QUERY,
+            ),
+            OpenApiParameter(
                 name="data_valida",
                 type=OpenApiTypes.STR,
                 description="Filtra as rotas pela data e por ainda estar válida para reserva",
@@ -228,6 +242,26 @@ class RotaViewSet(ModelViewSet):
 
         if data_formatada:
             queryset = queryset.filter(data=data_formatada)
+
+        ######## Filtro de intervalo de data ########
+
+        data_inicial = self.request.query_params.get("data_inicial")
+        data_final = self.request.query_params.get("data_final")
+        format = "%Y-%m-%d"
+        data_inicial_formatada = None
+        data_final_formatada = None
+
+        try:
+            data_inicial_formatada = datetime.strptime(data_inicial, format)
+            data_final_formatada = datetime.strptime(data_final, format)
+        except:
+            data_inicial_formatada = None
+            data_final_formatada = None
+
+        if data_inicial_formatada and data_final_formatada:
+            queryset = queryset.filter(
+                data__range=(data_inicial_formatada, data_final_formatada)
+            )
 
         ######## Filtro de rotas a partir de hoje ########
 
