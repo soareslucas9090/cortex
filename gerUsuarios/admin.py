@@ -66,11 +66,12 @@ class UserAdmin(admin.ModelAdmin):
         "email",
         "tipo",
         "data_nascimento",
+        "deficiencia",
         "is_active",
         "is_superuser",
         "date_joined",
     )
-    list_filter = ("is_active", "tipo", "is_superuser")
+    list_filter = ("is_active", "tipo", "is_superuser", "deficiencia")
     inlines = [MatriculaInline, SetorUserInline]
 
     # Divisão dos itens para edição em Categorias

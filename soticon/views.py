@@ -290,11 +290,16 @@ class RotaViewSet(ModelViewSet):
         minutos_permitidos = Regras.objects.get(
             descricao="tempo_ate_fechamento_reservas"
         )
-        horario_permitido = datetime.now() + timedelta(
-            minutes=minutos_permitidos.parametro
-        )
 
         if data_valida_formatada:
+            if not self.request.user.deficiencia:
+                horario_permitido = datetime.now() + timedelta(
+                    minutes=minutos_permitidos.parametro
+                )
+
+            else:
+                horario_permitido = datetime.now()
+
             queryset = queryset.filter(
                 data=data_valida_formatada,
                 status="espera",
