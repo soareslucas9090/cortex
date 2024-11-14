@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consumo de Energia</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  </head>
+  <body>
+    <div class="consumo-container">
+      <h1 id="consumo">0.00 kWh</h1>
+      <p id="consumo-atual">Consumo Atual</p>
+      <div class="circle">
+        <div class="circle-content"></div>
+      </div>
+      <div class="contador">
+        <p>
+          Atualizando em: <span id="contador">0</span> seg
+        </p>
+      </div>
+    </div>
+
+    <script>
+      let contador = 10
+      
+      // Função para atualizar o consumo e reiniciar o contador
+      function atualizarConsumo() {
+        fetch('/cortex/api/watt/v1/consumo/')
+          .then((response) => response.json())
+          .then((data) => {
+            // Atualiza o valor do consumo
+            document.getElementById('consumo').innerText = data.consumo + ' kWh'
+          })
+          .catch((error) => {
+            console.error('Erro ao obter consumo:', error)
+          })
+      
+        // Reinicia o contador
+        contador = 10
+      }
+      
+      // Função para atualizar o contador a cada segundo
+      function atualizarContador() {
+        if (contador > 0) {
+          contador--
+          document.getElementById('contador').innerText = contador
+        } else {
+          atualizarConsumo() // Quando o contador chegar a zero, atualiza o consumo
+        }
+      }
+      
+      // Atualiza o contador a cada 1 segundo
+      setInterval(atualizarContador, 1000)
+      
+      // Atualiza o consumo ao carregar a página
+      atualizarConsumo()
+    </script>
+  </body>
+</html>

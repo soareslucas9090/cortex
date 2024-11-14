@@ -40,6 +40,7 @@ urlpatterns = [
     path("cortex/api/token/verify/", TokenVerifyViewDOC.as_view(), name="token_verify"),
     path("cortex/api/gerusuarios/v1/", include("gerUsuarios.urls")),
     path("cortex/api/soticon/v1/", include("soticon.urls")),
+    path("cortex/api/watt/v1/", include("watt.urls")),
     path("cortex/api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "cortex/api/schema/swagger/",

@@ -83,6 +83,7 @@ INSTALLED_APPS = [
     "drf_spectacular_sidecar",
     "gerUsuarios",
     "soticon",
+    "watt",
 ]
 
 MIDDLEWARE = [

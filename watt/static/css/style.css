@@ -1,0 +1,90 @@
+* {
+    font-family: 'Courier New', Courier, monospace;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f9f9f9;
+}
+
+.consumo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+.circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 300px;
+    height: 300px;
+    border: 10px solid transparent;
+    border-top-color: #3991c9;
+    border-right-color: #3991c9;
+    border-left-color: #3991c9;
+    border-radius: 50%;
+    animation: spin 3s linear infinite;
+    margin-bottom: 20px; /* Ajusta o espaço entre o círculo e o contador */
+}
+
+.circle-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    background-color: #ffffff; /* Cor de fundo para destacar o texto */
+}
+
+h1 {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+#consumo-atual {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+}
+
+p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.contador {
+    font-size: 1.2rem;
+    color: #555;
+    margin-top: 15px;
+}
+
+/* Animação para o círculo girando */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
