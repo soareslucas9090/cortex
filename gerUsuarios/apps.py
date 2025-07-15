@@ -29,6 +29,14 @@ def create_default_tipos(sender, **kwargs):
         "Coordenador",
         "Tec.Administrativo",
         "Serv.Terceirizado",
+        "Engenheiro",
+        "Enfermeiro",
+        "Medico",
+        "Psicologo",
+        "Nutricionista",
+        "Odontologo",
+        "Pedagogo",
+        "Vigilante",
     ]
 
     for name_tipo in default_tipos:
@@ -84,6 +92,37 @@ def create_default_setores(sender, **kwargs):
         "Refeitorio",
         "Guarita",
         "Area Externa",
+        "PROF ENS BAS TEC TECNOLOGICO-SUBSTITUTO",
+        "ASSISTENTE EM ADMINISTRACAO",
+        "ASSISTENTE DE ALUNO",
+        "TEC DE TECNOLOGIA DA INFORMACAO",
+        "PROFESSOR ENS BASICO TECN TECNOLOGICO",
+        "ENGENHEIRO",
+        "BIBLIOTECARIO-DOCUMENTALISTA",
+        "VIGILANTE",
+        "TECNICO EM AUDIOVISUAL",
+        "CONTADOR",
+        "AUXILIAR DE BIBLIOTECA",
+        "AUX EM ADMINISTRACAO",
+        "ADMINISTRADOR",
+        "ENFERMEIRO",
+        "TECNICO EM ELETROTECNICA",
+        "TECNICO DE LABORATORIO",
+        "PSICOLOGO",
+        "TECNICO EM ARQUIVO",
+        "ASSISTENTE SOCIAL",
+        "TECNICO EM ASSUNTOS EDUCACIONAIS",
+        "ODONTOLOGO",
+        "SECRETARIO EXECUTIVO",
+        "PEDAGOGO",
+        "ASSISTENTE DE LABORATORIO",
+        "MEDICO",
+        "NUTRICIONISTA",
+        "TECNICO EM ENFERMAGEM",
+        "TECNICO EM SECRETARIADO",
+        "ANALISTA DE TEC DA INFORMACAO",
+        "LIMPEZA",
+        "AUX. COZINHA"
     ]
 
     for name_setor in default_setor:
@@ -100,7 +139,10 @@ def create_default_empresa(sender, **kwargs):
     try:
         Empresa.objects.get(cnpj="10806496000491")
     except:
-        Empresa.objects.create(cnpj="10806496000491", nome="IFPI - Campus Floriano")
+        Empresa.objects.create(
+            cnpj="10806496000491",
+            nome="IFPI - Campus Floriano"
+        )
         pass
 
 
@@ -114,6 +156,9 @@ def create_default_deficiencia(sender, **kwargs):
         "Deficiência intelectual",
         "Deficiência psicossocial ou por saúde mental",
         "Deficiência múltipla",
+        "Deficiência",
+        "Baixa Visão",
+        "Surdez",
     ]
 
     for deficiencia in deficiencias:

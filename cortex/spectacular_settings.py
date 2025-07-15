@@ -13,7 +13,7 @@ SPECTACULAR_SETTINGS = {
         {
             "name": "Gerenciamento De Usuários.Tipos",
             "description": """Rotas relacionadas com os tipos de usuários.\n
-    Tipos padrões: "Admin", "TI", "Aluno", "Motorista", "Professor", "Diretor.Geral", "Diretor.Ensino", "Coordenador", "Tec.Administrativo", "Serv.Terceirizado".""",
+    Tipos padrões: "Admin", "TI", "Aluno", "Motorista", "Professor", "Diretor.Geral", "Diretor.Ensino", "Coordenador", "Tec.Administrativo", "Serv.Terceirizado", "Engenheiro", "Enfermeiro", "Medico", "Psicologo", "Nutricionista", "Odontologo", "Pedagogo", "Vigilante".""",
         },
         {
             "name": "Gerenciamento De Usuários.Enderecos",
@@ -34,7 +34,7 @@ SPECTACULAR_SETTINGS = {
         {
             "name": "Gerenciamento De Usuários.Deficiencias",
             "description": """Rotas relacionadas os tipos de deficiências.\n
-    Tipos padrões: "Deficiência física", "Deficiência auditiva", "Deficiência visual", "Deficiência intelectual", "Deficiência psicossocial ou por saúde mental", "Deficiência múltipla".""",
+    Tipos padrões: "Deficiência física", "Deficiência auditiva", "Deficiência visual", "Deficiência intelectual", "Deficiência psicossocial ou por saúde mental", "Deficiência múltipla", "Deficiência", "Baixa Visão", "Surdez".""",
         },
         {
             "name": "Gerenciamento De Usuários.Inserir Vários Alunos",
@@ -59,7 +59,7 @@ SPECTACULAR_SETTINGS = {
         {
             "name": "Gerenciamento De Usuários.Setores",
             "description": """Rotas relacionadas com os setores dos usuários.\n
-    Setores padrões: "Alunos", "Direcao Geral", "Direcao de Ensino", "Direcao de Administracao e Planejamento", "Coordenacao Informatica", "Coordenacao Tec Informatica", "Coordenacao Eletromecanica", "Coordenacao Tec Eletromecanica", "Coordenacao Edificacoes", "Coordenacao Tec Edificacoes", "Coordenacao Meio Ambiente", "Coordenacao Tec Meio Ambiente", "Coordenacao TADS", "Coordenacao Biologia", "Coordenacao Matematica", "Coordenacao PROFMAT", "Coordenacao de Compras e Licitacao", "Coordenacao de Controle Academico", "Coordenacao de Disciplina", "Coordenacao de Ed. Fisica", "Coordenacao de Extensao", "Coordenacao de Multimidia", "Coordenacao de Patrimônio e Almoxarifado", "Coordenacao de Pesquisa e Inovacao", "TI", "Biblioteca", "Casa da Leitura", "Departamento Contabilidade", "Departamento Apoio ao Ensino", "Departamento Logistica, Manutencao e Compras", "Enfermagem", "Engenharia", "Nutricao", "Psicologia", "Saude", "Servico Social", "Medico", "Odontologico", "Pedagogico", "Refeitorio", "Guarita", "Area Externa".""",
+    Setores padrões: "Alunos", "Direcao Geral", "Direcao de Ensino", "Direcao de Administracao e Planejamento", "Coordenacao Informatica", "Coordenacao Tec Informatica", "Coordenacao Eletromecanica", "Coordenacao Tec Eletromecanica", "Coordenacao Edificacoes", "Coordenacao Tec Edificacoes", "Coordenacao Meio Ambiente", "Coordenacao Tec Meio Ambiente", "Coordenacao TADS", "Coordenacao Biologia", "Coordenacao Matematica", "Coordenacao PROFMAT", "Coordenacao de Compras e Licitacao", "Coordenacao de Controle Academico", "Coordenacao de Disciplina", "Coordenacao de Ed. Fisica", "Coordenacao de Extensao", "Coordenacao de Multimidia", "Coordenacao de Patrimônio e Almoxarifado", "Coordenacao de Pesquisa e Inovacao", "TI", "Biblioteca", "Casa da Leitura", "Departamento Contabilidade", "Departamento Apoio ao Ensino", "Departamento Logistica, Manutencao e Compras", "Enfermagem", "Engenharia", "Nutricao", "Psicologia", "Saude", "Servico Social", "Medico", "Odontologico", "Pedagogico", "Refeitorio", "Guarita", "Area Externa", "PROF ENS BAS TEC TECNOLOGICO-SUBSTITUTO", "ASSISTENTE EM ADMINISTRACAO", "ASSISTENTE DE ALUNO", "TEC DE TECNOLOGIA DA INFORMACAO", "PROFESSOR ENS BASICO TECN TECNOLOGICO", "ENGENHEIRO", "BIBLIOTECARIO-DOCUMENTALISTA", "VIGILANTE", "TECNICO EM AUDIOVISUAL", "CONTADOR", "AUXILIAR DE BIBLIOTECA", "AUX EM ADMINISTRACAO", "ADMINISTRADOR", "ENFERMEIRO", "TECNICO EM ELETROTECNICA", "TECNICO DE LABORATORIO", "PSICOLOGO", "TECNICO EM ARQUIVO", "ASSISTENTE SOCIAL", "TECNICO EM ASSUNTOS EDUCACIONAIS", "ODONTOLOGO", "SECRETARIO EXECUTIVO", "PEDAGOGO", "ASSISTENTE DE LABORATORIO", "MEDICO", "NUTRICIONISTA", "TECNICO EM ENFERMAGEM", "TECNICO EM SECRETARIADO", "ANALISTA DE TEC DA INFORMACAO", "LIMPEZA", "AUX. COZINHA".""",
         },
         {
             "name": "Gerenciamento De Usuários.Matriculas",
