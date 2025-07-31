@@ -52,7 +52,9 @@ def main():
         dados.append(dict_to_append)
 
     with transaction.atomic():
-        from gerUsuarios.models import User, Setor_User, Tipo, Matricula, Setor
+        from gerUsuarios.models import User, Empresa, Tipo, Matricula, Setor
+
+        ifpi = Empresa.objects.get(cnpj="10806496000491")
 
         for dado in dados:
             tipo = Tipo.objects.get(nome=dado["tipo"].lower())
@@ -65,6 +67,7 @@ def main():
                     "email": dado["email_institucional"],
                     "password": make_password(dado["matricula"]),
                     "tipo": tipo,
+                    "empresa": ifpi
                 }
             )
 
@@ -76,6 +79,28 @@ def main():
 
             user.setores.set([setor])
             user.save()
+
+        User.objects.get_or_create(
+            cpf="guarita",
+            defaults={
+                "nome": "Guarita",
+                "email": "guarita@servidores.ifpi.edu.br",
+                "tipo": Tipo.objects.get(nome="vigilante"),
+                "empresa": ifpi,
+                "password": make_password("guarita123")
+            }
+        )
+
+        User.objects.get_or_create(
+            cpf="codis",
+            defaults={
+                "nome": "Codis",
+                "email": "codis@servidores.ifpi.edu.br",
+                "tipo": Tipo.objects.get(nome="vigilante"),
+                "empresa": ifpi,
+                "password": make_password("codis123")
+            }
+        )
 
 
 if __name__ == "__main__":
