@@ -31,8 +31,8 @@ load_dotenv()
 signing_key = os.environ.get("secretKeyJWT")
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
-    "REFRESH_TOKEN_LIFETIME": timedelta(minutes=40),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "BLACKLIST_AFTER_ROTATION": False,
     "SIGNING_KEY": signing_key,
     "AUTH_HEADER_TYPES": ("Bearer",),
